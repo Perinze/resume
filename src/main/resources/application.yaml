@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: ${APP_NAME:unnamed}
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: ${URL:jdbc:mariadb://localhost/resume?useSSL=false&characterEncoding=utf8}
+    username: ${USERNAME:user}
+    password: ${PASSWORD:password}
