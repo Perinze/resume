@@ -1,9 +1,11 @@
 package com.unitoken.resume.web;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.Mac;
@@ -13,12 +15,18 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 
 @RestController
 @RequestMapping("/test")
 public class TestController {
 
     final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Value("${config.app-id}")
+    String appId;
+    @Value("${config.app-secret}")
+    String appSecret;
 
     //@GetMapping("/login/common")
     @CrossOrigin(origins = "https://recruit.itoken.team")
@@ -43,6 +51,15 @@ public class TestController {
                 .replace("~", "%7E")
                 .replace("/", "%2F");
         return urlEncodeSignature;
+    }
+
+    private String getUserInfo(String code) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+        String accessKey = appId;
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String signature = generateUrlSignature(appSecret, timestamp);
+
+        ObjectMapper mapper = new ObjectMapper();
+
     }
 
     class Code {
