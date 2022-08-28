@@ -10,7 +10,6 @@ public class TestController {
 
     final Logger logger = LoggerFactory.getLogger(getClass());
 
-
     //@GetMapping("/login/common")
     @CrossOrigin(origins = "https://recruit.itoken.team")
     @PostMapping(value = "/login/common",
@@ -19,16 +18,16 @@ public class TestController {
     public void login(@RequestBody Code code) {
         logger.info("code: " + code.getCode());
     }
-}
 
-class Code {
-    private String code;
+    class Code {
+        private String code;
 
-    public String getCode() {
-        return code;
-    }
+        public String getCode() {
+            return code;
+        }
 
-    public void setCode(String code) {
-        this.code = code;
+        public void setCode(String code) {
+            this.code = code;
+        }
     }
 }
