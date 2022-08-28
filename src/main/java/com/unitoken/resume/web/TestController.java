@@ -43,6 +43,10 @@ public class TestController {
         logger.info("code: " + code.getCode());
 
         UserInfo userInfo = getUserInfo(code.getCode());
+        if (userInfo == null) {
+            logger.error("get user info failed");
+            return;
+        }
         String openid = userInfo.openid;
         String unionid = userInfo.unionid;
         String nick = userInfo.nick;
