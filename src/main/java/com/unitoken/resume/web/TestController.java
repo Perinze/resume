@@ -1,6 +1,7 @@
 package com.unitoken.resume.web;
 
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -59,6 +60,7 @@ public class TestController {
         String signature = generateUrlSignature(appSecret, timestamp);
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     }
 
@@ -72,5 +74,18 @@ public class TestController {
         public void setCode(String code) {
             this.code = code;
         }
+    }
+
+    class UserInfo {
+        String nick;
+        String unionid;
+        String openid;
+        Boolean mainOrgAuthHighLevel;
+    }
+
+    class UserInfoResponse {
+        Long errcode;
+        UserInfo userInfo;
+        String errmsg;
     }
 }
