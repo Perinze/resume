@@ -6,3 +6,6 @@ spring:
     url: ${URL:jdbc:mariadb://localhost/resume?useSSL=false&characterEncoding=utf8}
     username: ${USERNAME:user}
     password: ${PASSWORD:password}
+  config:
+    appid: ${APPID:dingoalrnidom4p3khixr0}
+    appsecret: ${APPSECRET:QNDiNQbWbJfiLLuTkR523G8VDRT79Geo-2VplHBEZVJqOKQ62mE8v03lySvPRpoT}
