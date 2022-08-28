@@ -1,6 +1,7 @@
 package com.unitoken.resume.web;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
@@ -17,12 +19,15 @@ import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/test")
 public class TestController {
 
     final Logger logger = LoggerFactory.getLogger(getClass());
+    final RestTemplate restTemplate = new RestTemplate();
+    ObjectMapper mapper = new ObjectMapper();
 
     @Value("${config.app-id}")
     String appId;
@@ -34,8 +39,15 @@ public class TestController {
     @PostMapping(value = "/login/common",
     consumes = "application/json;charset=UTF-8",
     produces = "application/json;charset=UTF-8")
-    public void login(@RequestBody Code code) {
+    public void login(@RequestBody Code code) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException, JsonProcessingException {
         logger.info("code: " + code.getCode());
+
+        UserInfo userInfo = getUserInfo(code.getCode());
+        String openid = userInfo.openid;
+        String unionid = userInfo.unionid;
+        String nick = userInfo.nick;
+
+        logger.info("user info: " + mapper.writeValueAsString(userInfo));
     }
 
     private String generateUrlSignature(String secret, String timestamp) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
@@ -54,38 +66,115 @@ public class TestController {
         return urlEncodeSignature;
     }
 
-    private String getUserInfo(String code) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+    private UserInfo getUserInfo(String code) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException, JsonProcessingException {
         String accessKey = appId;
         String timestamp = String.valueOf(System.currentTimeMillis());
         String signature = generateUrlSignature(appSecret, timestamp);
 
+        logger.info("appid: " + appId);
+        logger.info("appsecret: " + appSecret);
+        logger.info("timestamp: " + timestamp);
+
+        String url = String.format(
+                "https://oapi.dingtalk.com/sns/getuserinfo_bycode?accessKey=%s&timestamp=%s&signature=%s",
+                accessKey, timestamp, signature);
+        UserInfoResponse response = restTemplate.postForObject(
+                url,
+                Map.of("tmp_auth_code", code),
+                UserInfoResponse.class
+        );
+
+        logger.info(mapper.writeValueAsString(response));
+        return response.userInfo;
+
+        /*
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+        UserInfoResponse response = mapper.readValue()
+         */
     }
 
-    class Code {
-        private String code;
+}
 
-        public String getCode() {
-            return code;
-        }
+class Code {
+    private String code;
 
-        public void setCode(String code) {
-            this.code = code;
-        }
+    public String getCode() {
+        return code;
     }
 
-    class UserInfo {
-        String nick;
-        String unionid;
-        String openid;
-        Boolean mainOrgAuthHighLevel;
+    public void setCode(String code) {
+        this.code = code;
+    }
+}
+
+class UserInfo {
+    String nick;
+    String unionid;
+    String openid;
+
+    public String getNick() {
+        return nick;
     }
 
-    class UserInfoResponse {
-        Long errcode;
-        UserInfo userInfo;
-        String errmsg;
+    public void setNick(String nick) {
+        this.nick = nick;
     }
+
+    public String getUnionid() {
+        return unionid;
+    }
+
+    public void setUnionid(String unionid) {
+        this.unionid = unionid;
+    }
+
+    public String getOpenid() {
+        return openid;
+    }
+
+    public void setOpenid(String openid) {
+        this.openid = openid;
+    }
+
+    public Boolean getMainOrgAuthHighLevel() {
+        return mainOrgAuthHighLevel;
+    }
+
+    public void setMainOrgAuthHighLevel(Boolean mainOrgAuthHighLevel) {
+        this.mainOrgAuthHighLevel = mainOrgAuthHighLevel;
+    }
+
+    Boolean mainOrgAuthHighLevel;
+}
+
+class UserInfoResponse {
+    Long errcode;
+    UserInfo userInfo;
+
+    public Long getErrcode() {
+        return errcode;
+    }
+
+    public void setErrcode(Long errcode) {
+        this.errcode = errcode;
+    }
+
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
+    }
+
+    public String getErrmsg() {
+        return errmsg;
+    }
+
+    public void setErrmsg(String errmsg) {
+        this.errmsg = errmsg;
+    }
+
+    String errmsg;
 }
