@@ -7,5 +7,5 @@ spring:
     username: ${USERNAME:user}
     password: ${PASSWORD:password}
 config:
-  app-id: ${APPID:dingit4vuspgz8jk7pce}
-  app-secret: ${APPSECRET:xhgolkRUphy07oM6f9se79ebyn18RYU0DHHWWToxWy7PRIfo0Sw13on90DxN2G-C}
+  app-id: ${APPID:cli_a384ab309178d00c}
+  app-secret: ${APPSECRET:wiZiveYzG1acpHXkzYwZWdvBumqmk3EL}
