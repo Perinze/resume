@@ -1,0 +1,2 @@
+#!/bin/bash
+curl https://jenkins.itoken.team/job/resume-dev/build?token=c8dd6a4046e95af2c43f0d445a381d9fe1870c2cd06d96b4057f36d4de070dbd
