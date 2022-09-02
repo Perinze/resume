@@ -4,8 +4,10 @@ package com.unitoken.resume.web;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.unitoken.resume.service.LarkService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -21,56 +23,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/")
 public class TestController {
-
-    @Value("${config.app-id}")
-    String appId;
-    @Value("${config.app-secret}")
-    String appSecret;
-
     final Logger logger = LoggerFactory.getLogger(getClass());
-    final RestTemplate restTemplate = new RestTemplate();
     ObjectMapper mapper = new ObjectMapper();
 
-    String token;
-
-    void updateAppAccessToken() throws JSONException, JsonProcessingException {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        JSONObject body = new JSONObject();
-        body.put("app_id", appId);
-        body.put("app_secret", appSecret);
-        HttpEntity<String> request = new HttpEntity<>(body.toString(), headers);
-
-        var res = restTemplate.postForEntity(
-                "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal",
-                request, String.class);
-        JsonNode node = mapper.readTree(res.getBody());
-        token = node.get("tenant_access_token").asText();
-        logger.info(token);
-    }
-
-    void getUserInfo(String code) throws JSONException, JsonProcessingException {
-        String auth = "Bearer " + token;
-        logger.info("authorization: " + auth);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", auth);
-        JSONObject body = new JSONObject();
-        body.put("grant_type", "authorization_code");
-        body.put("code", code);
-        HttpEntity<String> request = new HttpEntity<>(body.toString(), headers);
-
-        var res = restTemplate.postForEntity(
-                "https://open.feishu.cn/open-apis/authen/v1/access_token",
-                request, String.class);
-        JsonNode node = mapper.readTree(res.getBody());
-        if (node.get("code").asInt() != 0) {
-            logger.error("get user info failed: " + node.get("msg").toString());
-            return;
-        }
-        JsonNode data = node.get("data");
-        logger.info(data.toString());
-    }
+    @Autowired
+    LarkService larkService;
 
     @GetMapping("/hello")
     public String hello() {
@@ -79,13 +36,22 @@ public class TestController {
 
     @GetMapping("/token")
     public void getToken() throws JSONException, JsonProcessingException {
-        updateAppAccessToken();
+        larkService.updateTenantAccessToken();
     }
 
     @PostMapping("/login/common")
     public void login(@RequestBody Map<String, String> req) throws JSONException, JsonProcessingException {
-        logger.info("/login/common");
-        logger.info(req.get("code"));
-        getUserInfo(req.get("code"));
+        larkService.updateTenantAccessToken();
+
+        String code = req.get("code");
+        logger.info(code);
+        JsonNode data = larkService.getUserAccessToken(code);
+        String userAccessToken = data.get("access_token").asText();
+        logger.info(userAccessToken);
+        String openId = data.get("open_id").asText();
+        String unionId = data.get("union_id").asText();
+
+        JsonNode userinfo = larkService.getContactUserInfo(unionId, userAccessToken);
+        logger.info(userinfo.toString());
     }
 }
