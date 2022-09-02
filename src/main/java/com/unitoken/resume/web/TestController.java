@@ -44,9 +44,32 @@ public class TestController {
         var res = restTemplate.postForEntity(
                 "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal",
                 request, String.class);
-        JsonNode root = mapper.readTree(res.getBody());
-        token = root.get("tenant_access_token").toString();
+        JsonNode node = mapper.readTree(res.getBody());
+        token = node.get("tenant_access_token").asText();
         logger.info(token);
+    }
+
+    void getUserInfo(String code) throws JSONException, JsonProcessingException {
+        String auth = "Bearer " + token;
+        logger.info("authorization: " + auth);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", auth);
+        JSONObject body = new JSONObject();
+        body.put("grant_type", "authorization_code");
+        body.put("code", code);
+        HttpEntity<String> request = new HttpEntity<>(body.toString(), headers);
+
+        var res = restTemplate.postForEntity(
+                "https://open.feishu.cn/open-apis/authen/v1/access_token",
+                request, String.class);
+        JsonNode node = mapper.readTree(res.getBody());
+        if (node.get("code").asInt() != 0) {
+            logger.error("get user info failed: " + node.get("msg").toString());
+            return;
+        }
+        JsonNode data = node.get("data");
+        logger.info(data.toString());
     }
 
     @GetMapping("/hello")
@@ -60,8 +83,9 @@ public class TestController {
     }
 
     @PostMapping("/login/common")
-    public void login(@RequestBody Map<String, String> req) {
+    public void login(@RequestBody Map<String, String> req) throws JSONException, JsonProcessingException {
         logger.info("/login/common");
         logger.info(req.get("code"));
+        getUserInfo(req.get("code"));
     }
 }
