@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeCreator;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.unitoken.resume.entity.Department;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -139,5 +140,10 @@ public class LarkService {
         }
 
         return responseNode.get("data");
+    }
+
+    public Department getDepartment(int unionId) {
+        // TODO implement later
+        return Department.TECHNICAL;
     }
 }
