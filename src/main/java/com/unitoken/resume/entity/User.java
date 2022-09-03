@@ -5,7 +5,7 @@ public class User {
     private Long id;
 
     private String nick;
-    private String openid;
+    private String unionId;
     private Department department;
     private Role role;
 
@@ -25,12 +25,12 @@ public class User {
         this.nick = nick;
     }
 
-    public String getOpenid() {
-        return openid;
+    public String getUnionId() {
+        return unionId;
     }
 
-    public void setOpenid(String openid) {
-        this.openid = openid;
+    public void setUnionId(String unionId) {
+        this.unionId = unionId;
     }
 
     public Department getDepartment() {
@@ -52,6 +52,6 @@ public class User {
     @Override
     public String toString() {
         return String.format("User[%s, %s, %s, %s, %s]",
-                getId(), getNick(), getOpenid(), getDepartment(), getRole());
+                getId(), getNick(), getUnionId(), getDepartment(), getRole());
     }
 }
