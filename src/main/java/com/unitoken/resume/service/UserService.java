@@ -32,7 +32,7 @@ public class UserService {
 
     public User getUserByCode(String code) throws JsonProcessingException {
         JsonNode data = larkService.getUserAccessToken(code);
-        int unionId = data.get("union_id").asInt();
+        String unionId = data.get("union_id").asText();
         User userOrNull = jdbcTemplate.queryForObject(
                 "SELECT id, nick, department, role FROM user WHERE unionid=?",
                 (ResultSet rs, int rowNum) -> {
@@ -48,7 +48,9 @@ public class UserService {
                 }
         );
         // new user
-        if (userOrNull == null) {
+        if (userOrNull != null) {
+            return userOrNull;
+        } else {
             User user = new User();
             user.setNick(data.get("name").asText());
             user.setDepartment(larkService.getDepartment(unionId));
@@ -72,8 +74,6 @@ public class UserService {
             }
             user.setId(holder.getKeyAs(Long.class));
             return user;
-        } else {
-            return userOrNull;
         }
     }
 }

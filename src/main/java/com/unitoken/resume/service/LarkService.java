@@ -122,7 +122,7 @@ public class LarkService {
         return responseNode.get("data");
     }
 
-    public JsonNode getContactUserInfo(String unionId, String userAccessToken) throws JsonProcessingException {
+    public JsonNode getContactUserInfo(String unionId) throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         logger.info("Bearer " + token);
@@ -142,7 +142,9 @@ public class LarkService {
         return responseNode.get("data");
     }
 
-    public Department getDepartment(int unionId) {
+    public Department getDepartment(String unionId) throws JsonProcessingException {
+        JsonNode data = getContactUserInfo(unionId);
+
         // TODO implement later
         return Department.TECHNICAL;
     }

@@ -51,7 +51,7 @@ public class TestController {
         String openId = data.get("open_id").asText();
         String unionId = data.get("union_id").asText();
 
-        JsonNode userinfo = larkService.getContactUserInfo(unionId, userAccessToken);
+        JsonNode userinfo = larkService.getContactUserInfo(unionId);
         logger.info(userinfo.toString());
     }
 }
