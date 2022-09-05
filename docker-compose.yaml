@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  resume-dev:
+    image: resume-dev:0.1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        username: resume_dev
+        password: 2d3cfdc963cc7b954958001115d941c96a8502f45e13685f2bc899d6cc0fc921
+        url: jdbc:mariadb://host-gateway/resume_dev?useSSL=false&characterEncoding=utf8
+    ports:
+      - "8080:8080"

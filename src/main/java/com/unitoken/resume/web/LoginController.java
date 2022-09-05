@@ -3,7 +3,10 @@ package com.unitoken.resume.web;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unitoken.resume.entity.User;
+import com.larksuite.oapi.core.AppSettings;
+import com.larksuite.oapi.core.Config;
+import com.larksuite.oapi.service.contact.v3.ContactService;
+import com.larksuite.oapi.service.contact.v3.model.User;
 import com.unitoken.resume.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +19,19 @@ import java.util.Map;
 @RestController
 @RequestMapping("/login")
 public class LoginController {
+
     final Logger logger = LoggerFactory.getLogger(getClass());
-    ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
-    UserService userService;
+    AppSettings appSettings;
+    @Autowired
+    Config config;
 
-    @PostMapping("/login")
-    public String commonLoginHandler(@RequestBody Map<String, String> request) throws JsonProcessingException {
+    @Autowired
+    ContactService contactService;
+
+    @PostMapping("/common")
+    public void commonLoginHandler(@RequestBody Map<String, String> request) throws Exception {
         /*
         1. extract code from request
         2. get union id by the code
@@ -37,15 +45,19 @@ public class LoginController {
            - scope: scope (depend on role)
          */
         String code = request.get("code");
-        User user = userService.getUserByCode(code);
-        // TODO generate true token
-        String token = "token";
-        return mapper.createObjectNode()
+
+        User user = new User();
+        user.getName();
+        contactService.getUsers().;
+
+        /*
+        return mapper.createObjectNode().asText();
                 .put("code", 0)
                 .put("access_token", token)
                 .put("nick", user.getNick())
                 .put("department", user.getDepartment().toString())
                 .put("scope", user.getRole().toString())
                 .asText();
+         */
     }
 }

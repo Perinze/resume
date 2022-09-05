@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import javax.print.attribute.standard.Media;
+import java.util.Iterator;
 import java.util.Map;
 
 @Component
@@ -68,7 +69,7 @@ public class LarkService {
         body.put("grant_type", "authorization_code");
         body.put("code", code);
 
-        logger.info(body.toString());
+        //logger.info(body.toString());
         HttpEntity<String> request = new HttpEntity<>(body.toString(), headers);
         var response = restTemplate.postForEntity(
                 "https://open.feishu.cn/open-apis/authen/v1/access_token",
@@ -139,13 +140,30 @@ public class LarkService {
             throw new RuntimeException("UserAccessToken: " + responseNode.get("msg").asText());
         }
 
-        return responseNode.get("data");
+        return responseNode.get("data").get("user");
     }
 
-    public Department getDepartment(String unionId) throws JsonProcessingException {
+    public Iterator<JsonNode> getDepartmentIdsByUnionId(String unionId) throws JsonProcessingException {
         JsonNode data = getContactUserInfo(unionId);
+        return data.get("department_ids").elements();
+    }
 
-        // TODO implement later
-        return Department.TECHNICAL;
+    public JsonNode getDepartment(String departmentId, String accessToken) throws JsonProcessingException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + accessToken);
+
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        var response = restTemplate.exchange(
+                "https://open.feishu.cn/open-apis/contact/v3/departments/{id}?department_id_type={type}",
+                HttpMethod.GET, request, String.class,
+                departmentId, "open_department_id");
+        JsonNode responseNode = mapper.readTree(response.getBody());
+
+        if (0 != responseNode.get("code").asInt()) {
+            throw new RuntimeException("UserAccessToken: " + responseNode.get("msg").asText());
+        }
+
+        return responseNode.get("data").get("department");
     }
 }

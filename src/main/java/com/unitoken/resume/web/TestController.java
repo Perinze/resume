@@ -39,7 +39,7 @@ public class TestController {
         larkService.updateTenantAccessToken();
     }
 
-    @PostMapping("/login/common")
+    @PostMapping("/login/common1")
     public void login(@RequestBody Map<String, String> req) throws JSONException, JsonProcessingException {
         larkService.updateTenantAccessToken();
 
