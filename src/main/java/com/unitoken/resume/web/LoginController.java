@@ -26,7 +26,8 @@ public class LoginController {
 
     final Logger logger = LoggerFactory.getLogger(getClass());
 
-    ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    ObjectMapper mapper;
 
     @Autowired
     Client client;
