@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
 @SpringBootApplication
 public class ResumeApplication {
@@ -13,10 +14,10 @@ public class ResumeApplication {
 		SpringApplication.run(ResumeApplication.class, args);
 	}
 
-	@Value("${config.app-id")
+	@Value("${config.app-id}")
 	String appId;
 
-	@Value("${config.app-secret")
+	@Value("${config.app-secret}")
 	String appSecret;
 
 	@Bean
@@ -24,5 +25,14 @@ public class ResumeApplication {
 		return Client.newBuilder(appId, appSecret)
 				.logReqAtDebug(true)
 				.build();
+	}
+	@Bean
+	public CommonsRequestLoggingFilter requestLoggingFilter() {
+	    CommonsRequestLoggingFilter loggingFilter = new CommonsRequestLoggingFilter();
+	    loggingFilter.setIncludeClientInfo(true);
+	    loggingFilter.setIncludeQueryString(true);
+	    loggingFilter.setIncludePayload(true);
+	    loggingFilter.setMaxPayloadLength(64000);
+	    return loggingFilter;
 	}
 }
