@@ -1,5 +1,6 @@
 package com.unitoken.resume;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lark.oapi.Client;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -34,5 +35,10 @@ public class ResumeApplication {
 	    loggingFilter.setIncludePayload(true);
 	    loggingFilter.setMaxPayloadLength(64000);
 	    return loggingFilter;
+	}
+
+	@Bean
+	public ObjectMapper objectMapper() {
+		return new ObjectMapper();
 	}
 }
