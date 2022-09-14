@@ -1,6 +1,7 @@
 package com.unitoken.resume.web;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.unitoken.resume.model.Cv;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "https://resume-dev.itoken.team")
 @RestController
-@RequestMapping("/cv")
 public class CvController {
 
     @Autowired
@@ -23,7 +23,7 @@ public class CvController {
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    @GetMapping(value = "{id}",
+    @GetMapping(value = "/cv/{id}",
             produces = "application/json;charset=UTF-8")
     public String getCv(@PathVariable Long id) throws JsonProcessingException {
         logger.info("id=" + id);
@@ -33,5 +33,21 @@ public class CvController {
         String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
         logger.info(jsonString);
         return jsonString;
+    }
+
+    @PostMapping(value = "/cv",
+        consumes = "application/json;charset=UTF-8",
+        produces = "application/json;charset=UTF-8")
+    public void postCv(@RequestBody JsonNode cvNode) {
+        logger.info("post cv");
+        Cv cv = new Cv(
+                0L,
+                cvNode.get("author").asText(),
+                cvNode.get("department").asText(),
+                cvNode.get("content").asText(),
+                "unchecked"
+        );
+        cvService.insert(cv);
+        logger.info(cv.toString());
     }
 }

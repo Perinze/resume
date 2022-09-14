@@ -54,4 +54,15 @@ public class Cv {
     public void setDepartment(String department) {
         this.department = department;
     }
+
+    @Override
+    public String toString() {
+        return "Cv{" +
+                "id=" + id +
+                ", author='" + author + '\'' +
+                ", department='" + department + '\'' +
+                ", content='" + content + '\'' +
+                ", state='" + state + '\'' +
+                '}';
+    }
 }
