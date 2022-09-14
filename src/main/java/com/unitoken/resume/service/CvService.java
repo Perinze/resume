@@ -9,12 +9,30 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class CvService {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    public List<Cv> getAll() {
+        return jdbcTemplate.query(
+                "SELECT id, author, department, content, state FROM cv",
+                (ResultSet rs, int rowNum) -> {
+                    // TODO check if result set is empty
+                    return new Cv(
+                            rs.getLong("id"),
+                            rs.getString("author"),
+                            rs.getString("department"),
+                            rs.getString("content"),
+                            rs.getString("state")
+                    );
+                }
+        );
+    }
 
     public Cv getById(Long id) {
         return jdbcTemplate.query(

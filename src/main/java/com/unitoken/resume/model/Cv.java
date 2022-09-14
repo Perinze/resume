@@ -1,18 +1,23 @@
 package com.unitoken.resume.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Cv {
     Long id;
     String author;
     String department;
     String content;
     String state;
+    List<String> comments;
 
-    public Cv(Long id, String author, String department, String content, String state) {
+    public Cv(Long id, String author, String department, String content, String state, List<String> comments) {
         this.id = id;
         this.author = author;
         this.department = department;
         this.content = content;
         this.state = state;
+        this.comments = comments;
     }
 
     public Long getId() {
@@ -55,6 +60,23 @@ public class Cv {
         this.department = department;
     }
 
+    public List<String> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<String> comments) {
+        this.comments = comments;
+    }
+
+    public Cv(Long id, String author, String department, String content, String state) {
+        this.id = id;
+        this.author = author;
+        this.department = department;
+        this.content = content;
+        this.state = state;
+        this.comments = new ArrayList<>();
+    }
+
     @Override
     public String toString() {
         return "Cv{" +
@@ -63,6 +85,7 @@ public class Cv {
                 ", department='" + department + '\'' +
                 ", content='" + content + '\'' +
                 ", state='" + state + '\'' +
+                ", comments=" + comments +
                 '}';
     }
 }
