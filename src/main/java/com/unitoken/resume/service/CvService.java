@@ -78,6 +78,20 @@ public class CvService {
         cv.setId(holder.getKey().longValue());
     }
 
+    public void modifyState(Long id, String state) {
+        if (1 != jdbcTemplate.update(
+                (conn) -> {
+                    var ps = conn.prepareStatement(
+                            "UPDATE cv SET state = ? WHERE id = ?");
+                    ps.setString(1, state);
+                    ps.setLong(2, id);
+                    return ps;
+                }
+        )) {
+            throw new RuntimeException("failed to insert cv");
+        }
+    }
+
     public List<Comment> getComments(Cv cv) {
         return jdbcTemplate.query(
                 "SELECT id, cv_id, author, content FROM comment WHERE cv_id = ?",

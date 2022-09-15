@@ -65,6 +65,14 @@ public class CvController {
         logger.info(cv.toString());
     }
 
+    @PatchMapping(value = "/cv/{id}",
+            consumes = "application/json;charset=UTF-8",
+            produces = "application/json;charset=UTF-8")
+    public void patchCv(@PathVariable Long id, @RequestBody JsonNode cvNode) {
+        String state = cvNode.get("state").asText();
+        cvService.modifyState(id, state);
+    }
+
     @PostMapping(value = "/cv/{cv_id}/comment",
             consumes = "application/json;charset=UTF-8",
             produces = "application/json;charset=UTF-8")
