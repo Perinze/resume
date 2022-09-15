@@ -9,16 +9,7 @@ public class Cv {
     String department;
     String content;
     String state;
-    List<String> comments;
-
-    public Cv(Long id, String author, String department, String content, String state, List<String> comments) {
-        this.id = id;
-        this.author = author;
-        this.department = department;
-        this.content = content;
-        this.state = state;
-        this.comments = comments;
-    }
+    List<Comment> comments;
 
     public Long getId() {
         return id;
@@ -60,11 +51,11 @@ public class Cv {
         this.department = department;
     }
 
-    public List<String> getComments() {
+    public List<Comment> getComments() {
         return comments;
     }
 
-    public void setComments(List<String> comments) {
+    public void setComments(List<Comment> comments) {
         this.comments = comments;
     }
 
