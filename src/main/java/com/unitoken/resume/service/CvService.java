@@ -58,7 +58,7 @@ public class CvService {
         return cv;
     }
 
-    public void insert(Cv cv) {
+    public void insertCv(Cv cv) {
         KeyHolder holder = new GeneratedKeyHolder();
         if (1 != jdbcTemplate.update(
                 (conn) -> {

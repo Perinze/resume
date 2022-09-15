@@ -60,7 +60,7 @@ public class CvController {
                 cvNode.get("content").asText(),
                 "unchecked"
         );
-        cvService.insert(cv);
+        cvService.insertCv(cv);
         logger.info(cv.toString());
     }
 }
