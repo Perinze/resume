@@ -88,7 +88,20 @@ public class CvService {
                     return ps;
                 }
         )) {
-            throw new RuntimeException("failed to insert cv");
+            throw new RuntimeException("failed to modify cv state");
+        }
+    }
+
+    public void deleteCv(Long id) {
+        if (1 != jdbcTemplate.update(
+                (conn) -> {
+                    var ps = conn.prepareStatement(
+                            "DELETE FROM cv WHERE id = ?");
+                    ps.setLong(1, id);
+                    return ps;
+                }
+        )) {
+            throw new RuntimeException("failed to delete cv");
         }
     }
 

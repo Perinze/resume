@@ -74,6 +74,11 @@ public class CvController {
         cvService.modifyState(id, state);
     }
 
+    @DeleteMapping(value = "/cv/{id}")
+    public void deleteCv(@PathVariable Long id) {
+        cvService.deleteCv(id);
+    }
+
     @PostMapping(value = "/cv/{cv_id}/comment",
             consumes = "application/json;charset=UTF-8",
             produces = "application/json;charset=UTF-8")
