@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.unitoken.resume.model.Comment;
 import com.unitoken.resume.model.Cv;
 import com.unitoken.resume.service.CvService;
 import org.slf4j.Logger;
@@ -62,5 +63,18 @@ public class CvController {
         );
         cvService.insertCv(cv);
         logger.info(cv.toString());
+    }
+
+    @PostMapping(value = "/cv/{cv_id}/comment",
+            consumes = "application/json;charset=UTF-8",
+            produces = "application/json;charset=UTF-8")
+    public void postComment(@PathVariable Long cv_id, @RequestBody JsonNode commentNode) {
+        Comment comment = new Comment(
+                0L,
+                cv_id,
+                commentNode.get("author").asText(),
+                commentNode.get("content").asText()
+        );
+        cvService.insertComment(cv_id, comment);
     }
 }

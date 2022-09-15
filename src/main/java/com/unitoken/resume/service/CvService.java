@@ -93,4 +93,23 @@ public class CvService {
                 cv.getId()
         );
     }
+
+    public void insertComment(Long cv_id, Comment comment) {
+        KeyHolder holder = new GeneratedKeyHolder();
+        if (1 != jdbcTemplate.update(
+                (conn) -> {
+                    var ps = conn.prepareStatement(
+                            "INSERT INTO comment (cv_id, author, content) VALUES (?, ?, ?)",
+                            Statement.RETURN_GENERATED_KEYS);
+                    ps.setLong(1, cv_id);
+                    ps.setString(2, comment.getAuthor());
+                    ps.setString(3, comment.getContent());
+                    return ps;
+                },
+                holder
+        )) {
+            throw new RuntimeException("failed to insert comment");
+        }
+        comment.setId(holder.getKey().longValue());
+    }
 }
