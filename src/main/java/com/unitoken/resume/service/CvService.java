@@ -1,5 +1,6 @@
 package com.unitoken.resume.service;
 
+import com.unitoken.resume.model.Comment;
 import com.unitoken.resume.model.Cv;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,7 +20,7 @@ public class CvService {
     JdbcTemplate jdbcTemplate;
 
     public List<Cv> getAll() {
-        return jdbcTemplate.query(
+        List<Cv> cvs = jdbcTemplate.query(
                 "SELECT id, author, department, content, state FROM cv",
                 (ResultSet rs, int rowNum) -> {
                     // TODO check if result set is empty
@@ -32,10 +33,14 @@ public class CvService {
                     );
                 }
         );
+        for (Cv cv : cvs) {
+            cv.setComments(getComments(cv));
+        }
+        return cvs;
     }
 
     public Cv getById(Long id) {
-        return jdbcTemplate.query(
+        Cv cv = jdbcTemplate.query(
                 "SELECT id, author, department, content, state FROM cv WHERE id = ?",
                 (ResultSet rs, int rowNum) -> {
                     // TODO check if result set is empty
@@ -49,6 +54,8 @@ public class CvService {
                 },
                 id
         ).get(0);
+        cv.setComments(getComments(cv));
+        return cv;
     }
 
     public void insert(Cv cv) {
@@ -69,5 +76,21 @@ public class CvService {
             throw new RuntimeException("failed to insert cv");
         }
         cv.setId(holder.getKey().longValue());
+    }
+
+    public List<Comment> getComments(Cv cv) {
+        return jdbcTemplate.query(
+                "SELECT id, cv_id, author, content FROM comment WHERE cv_id = ?",
+                (ResultSet rs, int rowNum) -> {
+                    // TODO check if result set is empty
+                    return new Comment(
+                            rs.getLong("id"),
+                            rs.getLong("cv_id"),
+                            rs.getString("author"),
+                            rs.getString("content")
+                    );
+                },
+                cv.getId()
+        );
     }
 }
