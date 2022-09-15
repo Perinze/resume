@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@CrossOrigin(origins = "https://resume-dev.itoken.team")
+//@CrossOrigin(origins = {"https://resume-dev.itoken.team", "http://localhost:8080"})
+@CrossOrigin
 @RestController
 public class LoginController {
 
@@ -37,6 +38,7 @@ public class LoginController {
     @ResponseBody
     public String loginHandler(@RequestBody Map<String, String> request) throws Exception, JsonMappingException {
 
+        /*
         String code = request.get("code");
 
         Map<String, Object> body = new HashMap<>();
@@ -60,9 +62,11 @@ public class LoginController {
 
         String openId = data.get("open_id").asText();
         String userAccessToken = data.get("access_token").asText();
+         */
 
         ObjectNode root = mapper.createObjectNode();
-        root.put("token", userAccessToken);
+        root.put("code", 0);
+        root.put("token", "token");
         String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
         return jsonString;
 
@@ -100,19 +104,5 @@ public class LoginController {
         logger.info(jsonString);
         return jsonString;
          */
-    }
-
-    @GetMapping(value = "/update",
-            produces = "application/json;charset=UTF-8")
-    @ResponseBody
-    public String updateInfoHandler() throws Exception, JsonMappingException {
-        ObjectNode root = mapper.createObjectNode();
-        root.put("code", 0)
-                .put("nick", "王超睿")
-                .put("department", "技术部")
-                .put("scope", "user");
-        String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
-        logger.info(jsonString);
-        return jsonString;
     }
 }

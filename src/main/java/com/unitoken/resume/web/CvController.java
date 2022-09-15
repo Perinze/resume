@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@CrossOrigin(origins = "https://resume-dev.itoken.team")
+@CrossOrigin
 @RestController
 public class CvController {
 
