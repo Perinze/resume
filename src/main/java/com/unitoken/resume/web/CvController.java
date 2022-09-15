@@ -69,6 +69,7 @@ public class CvController {
             consumes = "application/json;charset=UTF-8",
             produces = "application/json;charset=UTF-8")
     public void patchCv(@PathVariable Long id, @RequestBody JsonNode cvNode) {
+        // TODO check state as enum
         String state = cvNode.get("state").asText();
         cvService.modifyState(id, state);
     }
