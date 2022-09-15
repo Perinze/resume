@@ -21,7 +21,6 @@ import java.util.Map;
 
 @CrossOrigin(origins = "https://resume-dev.itoken.team")
 @RestController
-@RequestMapping("/login")
 public class LoginController {
 
     final Logger logger = LoggerFactory.getLogger(getClass());
@@ -32,7 +31,7 @@ public class LoginController {
     @Autowired
     Client client;
 
-    @PostMapping(value = "/",
+    @PostMapping(value = "/login",
             consumes = "application/json;charset=UTF-8",
             produces = "application/json;charset=UTF-8")
     @ResponseBody
