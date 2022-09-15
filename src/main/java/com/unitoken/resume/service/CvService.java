@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -121,14 +120,14 @@ public class CvService {
         );
     }
 
-    public void insertComment(Long cv_id, Comment comment) {
+    public void insertComment(Long cvId, Comment comment) {
         KeyHolder holder = new GeneratedKeyHolder();
         if (1 != jdbcTemplate.update(
                 (conn) -> {
                     var ps = conn.prepareStatement(
                             "INSERT INTO comment (cv_id, author, content) VALUES (?, ?, ?)",
                             Statement.RETURN_GENERATED_KEYS);
-                    ps.setLong(1, cv_id);
+                    ps.setLong(1, cvId);
                     ps.setString(2, comment.getAuthor());
                     ps.setString(3, comment.getContent());
                     return ps;

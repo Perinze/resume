@@ -2,13 +2,13 @@ package com.unitoken.resume.model;
 
 public class Comment {
     Long id;
-    Long cv_id;
+    Long cvId;
     String author;
     String content;
 
-    public Comment(Long id, Long cv_id, String author, String content) {
+    public Comment(Long id, Long cvId, String author, String content) {
         this.id = id;
-        this.cv_id = cv_id;
+        this.cvId = cvId;
         this.author = author;
         this.content = content;
     }
@@ -17,7 +17,7 @@ public class Comment {
     public String toString() {
         return "Comment{" +
                 "id=" + id +
-                ", cv_id=" + cv_id +
+                ", cvId=" + cvId +
                 ", author='" + author + '\'' +
                 ", content='" + content + '\'' +
                 '}';
@@ -32,11 +32,11 @@ public class Comment {
     }
 
     public Long getCv_id() {
-        return cv_id;
+        return cvId;
     }
 
-    public void setCv_id(Long cv_id) {
-        this.cv_id = cv_id;
+    public void setCv_id(Long cvId) {
+        this.cvId = cvId;
     }
 
     public String getAuthor() {

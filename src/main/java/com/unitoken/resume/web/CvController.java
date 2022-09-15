@@ -76,15 +76,15 @@ public class CvController {
         cvService.deleteCv(id);
     }
 
-    @PostMapping(value = "/cv/{cv_id}/comment",
+    @PostMapping(value = "/cv/{id}/comment",
             consumes = "application/json;charset=UTF-8")
-    public void postComment(@PathVariable Long cv_id, @RequestBody JsonNode commentNode) {
+    public void postComment(@PathVariable Long id, @RequestBody JsonNode commentNode) {
         Comment comment = new Comment(
                 0L,
-                cv_id,
+                id,
                 commentNode.get("author").asText(),
                 commentNode.get("content").asText()
         );
-        cvService.insertComment(cv_id, comment);
+        cvService.insertComment(id, comment);
     }
 }
