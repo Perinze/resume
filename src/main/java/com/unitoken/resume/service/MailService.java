@@ -91,4 +91,33 @@ public class MailService {
             throw new RuntimeException("failed to delete mail");
         }
     }
+
+    public Mail getDepartmentMail(Long id) {
+        return jdbcTemplate.query(
+                "SELECT id, author, content FROM mail WHERE id = (SELECT mail_id FROM department WHERE id = ?)",
+                (ResultSet rs, int rowNum) -> {
+                    // TODO check if result set is empty
+                    return new Mail(
+                            rs.getLong("id"),
+                            rs.getString("author"),
+                            rs.getString("content")
+                    );
+                },
+                id
+        ).get(0);
+    }
+
+    public void setDepartmentMail(Long departmentId, Long mailId) {
+        if (1 != jdbcTemplate.update(
+                (conn) -> {
+                    var ps = conn.prepareStatement(
+                            "UPDATE department SET mail_id = ? WHERE id = ?");
+                    ps.setLong(1, mailId);
+                    ps.setLong(2, departmentId);
+                    return ps;
+                }
+        )) {
+            throw new RuntimeException("failed to set department mail");
+        }
+    }
 }

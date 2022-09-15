@@ -75,4 +75,21 @@ public class MailController {
     public void deleteMail(@PathVariable Long id) {
         mailService.deleteMail(id);
     }
+
+    @GetMapping(value = "/department/{id}/mail",
+            produces = "application/json;charset=UTF-8")
+    public String getDepartmentMail(@PathVariable Long id) throws JsonProcessingException {
+        Mail mail = mailService.getDepartmentMail(id);
+        ObjectNode root = mapper.valueToTree(mail);
+        String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+        logger.info(jsonString);
+        return jsonString;
+    }
+
+    @PatchMapping(value = "/department/{id}/mail",
+            consumes = "application/json;charset=UTF-8")
+    public void patchDepartmentMail(@PathVariable Long id, @RequestBody JsonNode mailNode) {
+        Long mailId = mailNode.get("id").asLong();
+        mailService.setDepartmentMail(id, mailId);
+    }
 }
