@@ -92,9 +92,9 @@ public class MailService {
         }
     }
 
-    public Mail getDepartmentMail(Long id) {
+    public Mail getDepartmentMail(Long openId) {
         return jdbcTemplate.query(
-                "SELECT id, author, content FROM mail WHERE id = (SELECT mail_id FROM department WHERE id = ?)",
+                "SELECT id, author, content FROM mail WHERE id = (SELECT mail_id FROM department WHERE open_id = ?)",
                 (ResultSet rs, int rowNum) -> {
                     // TODO check if result set is empty
                     return new Mail(
@@ -103,17 +103,17 @@ public class MailService {
                             rs.getString("content")
                     );
                 },
-                id
+                openId
         ).get(0);
     }
 
-    public void setDepartmentMail(Long departmentId, Long mailId) {
+    public void setDepartmentMail(Long openId, Long mailId) {
         if (1 != jdbcTemplate.update(
                 (conn) -> {
                     var ps = conn.prepareStatement(
-                            "UPDATE department SET mail_id = ? WHERE id = ?");
+                            "UPDATE department SET mail_id = ? WHERE open_id = ?");
                     ps.setLong(1, mailId);
-                    ps.setLong(2, departmentId);
+                    ps.setLong(2, openId);
                     return ps;
                 }
         )) {

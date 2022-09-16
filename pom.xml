@@ -12,7 +12,7 @@
 	<artifactId>resume</artifactId>
 	<version>0.3</version>
 	<name>resume</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Token's resume system</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
