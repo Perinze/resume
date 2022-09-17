@@ -1,8 +1,11 @@
 package com.unitoken.resume;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lark.oapi.Client;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -57,5 +60,12 @@ public class ResumeApplication {
 	@Bean
 	String salt() {
 		return new SimpleDateFormat("HH+mm/ss&MM~dd").format(new Date());
+	}
+
+	@Bean
+	JWTVerifier verifier(@Autowired Algorithm algorithm, @Autowired String salt) {
+		return JWT.require(algorithm)
+				.withClaim("data", salt)
+				.build();
 	}
 }
