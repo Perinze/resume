@@ -1,5 +1,6 @@
 package com.unitoken.resume;
 
+import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lark.oapi.Client;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,6 +8,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @SpringBootApplication
 public class ResumeApplication {
@@ -21,6 +25,9 @@ public class ResumeApplication {
 	@Value("${config.app-secret}")
 	String appSecret;
 
+	@Value("${config.algo-secret}")
+	String algoSecret;
+
 	@Bean
 	Client createClient() {
 		return Client.newBuilder(appId, appSecret)
@@ -28,7 +35,7 @@ public class ResumeApplication {
 				.build();
 	}
 	@Bean
-	public CommonsRequestLoggingFilter requestLoggingFilter() {
+	CommonsRequestLoggingFilter requestLoggingFilter() {
 	    CommonsRequestLoggingFilter loggingFilter = new CommonsRequestLoggingFilter();
 	    loggingFilter.setIncludeClientInfo(true);
 	    loggingFilter.setIncludeQueryString(true);
@@ -38,7 +45,17 @@ public class ResumeApplication {
 	}
 
 	@Bean
-	public ObjectMapper objectMapper() {
+	ObjectMapper objectMapper() {
 		return new ObjectMapper();
+	}
+
+	@Bean
+	Algorithm algorithm() {
+		return Algorithm.HMAC256(algoSecret);
+	}
+
+	@Bean
+	String salt() {
+		return new SimpleDateFormat("HH+mm/ss&MM~dd").format(new Date());
 	}
 }

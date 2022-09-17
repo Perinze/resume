@@ -5,12 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lark.oapi.Client;
-import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.core.response.RawResponse;
 import com.lark.oapi.core.token.AccessTokenType;
-import com.lark.oapi.service.contact.v3.enums.GetDepartmentDepartmentIdTypeEnum;
-import com.lark.oapi.service.contact.v3.enums.GetUserUserIdTypeEnum;
-import com.lark.oapi.service.contact.v3.model.*;
+import com.unitoken.resume.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,15 +29,30 @@ public class LoginController {
     @Autowired
     Client client;
 
+    @Autowired
+    UserService userService;
+
     @PostMapping(value = "/login",
             consumes = "application/json;charset=UTF-8",
             produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String loginHandler(@RequestBody Map<String, String> request) throws Exception, JsonMappingException {
 
-        /*
         String code = request.get("code");
 
+        JsonNode data = auth(code);
+        String openId = data.get("open_id").asText();
+        String userAccessToken = data.get("access_token").asText();
+        String token = userService.getToken(openId);
+
+        ObjectNode root = mapper.createObjectNode();
+        root.put("code", 0);
+        root.put("token", "token");
+        String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+        return jsonString;
+    }
+
+    private JsonNode auth(String code) throws Exception {
         Map<String, Object> body = new HashMap<>();
         body.put("grant_type", "authorization_code");
         body.put("code", code);
@@ -58,51 +70,6 @@ public class LoginController {
         //System.out.println(resp.getRequestID());
         logger.info(respBody.toString());
 
-        JsonNode data = respBody.get("data");
-
-        String openId = data.get("open_id").asText();
-        String userAccessToken = data.get("access_token").asText();
-         */
-
-        ObjectNode root = mapper.createObjectNode();
-        root.put("code", 0);
-        root.put("token", "token");
-        String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
-        return jsonString;
-
-        /*
-        GetUserResp getUserResp = client.contact().user().get(
-                GetUserReq.newBuilder()
-                        .userId(openId)
-                        .userIdType(GetUserUserIdTypeEnum.OPEN_ID)
-                        .build());
-
-        User user = getUserResp.getData().getUser();
-        String nick = user.getName();
-        String departmentId = user.getDepartmentIds()[0];
-
-        GetDepartmentResp getDepartmentResp = client.contact().department().get(
-                GetDepartmentReq.newBuilder()
-                        .departmentId(departmentId)
-                        .departmentIdType(GetDepartmentDepartmentIdTypeEnum.OPEN_DEPARTMENT_ID)
-                        .build(),
-                RequestOptions.newBuilder()
-                        .userAccessToken(userAccessToken)
-                        .build()
-                );
-
-        logger.info("%d".formatted(getDepartmentResp.getCode()));
-        logger.info(getDepartmentResp.getMsg());
-
-        Department department = getDepartmentResp.getData().getDepartment();
-        String departmentName = department.getName();
-        logger.info(departmentName);
-
-        ObjectNode root = mapper.createObjectNode();
-        root.put("code", 0).put("access_token", "token").put("nick", nick).put("department", departmentName).put("scope", "user");
-        String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
-        logger.info(jsonString);
-        return jsonString;
-         */
+        return respBody.get("data");
     }
 }

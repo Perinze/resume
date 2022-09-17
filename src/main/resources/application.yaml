@@ -9,3 +9,4 @@ spring:
 config:
   app-id: ${APPID:cli_a384ab309178d00c}
   app-secret: ${APPSECRET:wiZiveYzG1acpHXkzYwZWdvBumqmk3EL}
+  algo-secret: ${ALGOSECRET:b5dc3419aed1ad2d6dffd8c53ea19e1f42fc07e9e8b5b221a34e552cdf13f173}
