@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.response.RawResponse;
 import com.lark.oapi.core.token.AccessTokenType;
+import com.unitoken.resume.model.User;
 import com.unitoken.resume.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,9 @@ public class LoginController {
         String openId = data.get("open_id").asText();
         String userAccessToken = data.get("access_token").asText();
         String token = userService.getToken(openId);
+
+        User user = userService.getUser(openId);
+        if (null == user) userService.addUser(openId);
 
         ObjectNode root = mapper.createObjectNode();
         root.put("code", 0);
