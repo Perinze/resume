@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.unitoken</groupId>
 	<artifactId>resume</artifactId>
-	<version>0.3</version>
+	<version>0.4</version>
 	<name>resume</name>
 	<description>Token's resume system</description>
 	<properties>
