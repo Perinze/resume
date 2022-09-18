@@ -50,7 +50,7 @@ public class UserService {
         String openId = jwt.getClaim("id").asString();
         logger.info("extract openid " + openId + "from token");
         if (jwt.getExpiresAtAsInstant()
-                .minus(2, ChronoUnit.MINUTES)
+                .minus(30, ChronoUnit.MINUTES)
                 .isBefore(Instant.now())) {
             // will expire in less than 30 min
             logger.info("refresh token");
@@ -72,7 +72,7 @@ public class UserService {
         Instant now = Instant.now();
         return JWT.create()
                 .withIssuedAt(now)
-                .withExpiresAt(now.plus(4, ChronoUnit.MINUTES))
+                .withExpiresAt(now.plus(2, ChronoUnit.HOURS))
                 .withClaim("id", openId)
                 .withClaim("data", salt)
                 .sign(algorithm);
