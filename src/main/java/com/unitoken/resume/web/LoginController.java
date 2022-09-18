@@ -47,7 +47,7 @@ public class LoginController {
 
         ObjectNode root = mapper.createObjectNode();
         root.put("code", 0);
-        root.put("token", "token");
+        root.put("token", token);
         String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
         return jsonString;
     }
