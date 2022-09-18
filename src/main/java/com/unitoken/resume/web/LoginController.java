@@ -1,5 +1,6 @@
 package com.unitoken.resume.web;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,6 +49,21 @@ public class LoginController {
         ObjectNode root = mapper.createObjectNode();
         root.put("code", 0);
         root.put("token", token);
+        String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+        return jsonString;
+    }
+
+    @GetMapping(value = "/login/refresh",
+            produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public String refreshHandler(@RequestHeader("Authorization") String token) throws JsonProcessingException {
+
+        ObjectNode root = mapper.createObjectNode();
+        logger.info(token);
+        root.put(
+                "token",
+                userService.refreshToken(token)
+        );
         String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
         return jsonString;
     }
