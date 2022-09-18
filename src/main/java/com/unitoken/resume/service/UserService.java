@@ -5,6 +5,8 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -26,28 +28,38 @@ public class UserService {
     @Autowired
     String salt;
 
+    Logger logger = LoggerFactory.getLogger(getClass());
+
     private Map<String, Deque<String>> tokenTable = new HashMap<>();
 
     // always return a valid token
     public String getToken(String openId) {
         String token = newestToken(openId);
+        logger.info(token);
         if (null == token) {
             token = encode(openId);
             pushToken(openId, token);
         }
+        logger.info("getToken " + getTokenDeque(openId).isEmpty());
+        logger.info("token " + token);
         return token;
     }
 
     public String refreshToken(String token) {
         DecodedJWT jwt = decode(token);
-        String openId = jwt.getClaim("id").toString();
+        String openId = jwt.getClaim("id").asString();
+        logger.info("extract openid " + openId + "from token");
         if (jwt.getExpiresAtAsInstant()
-                .minus(30, ChronoUnit.MINUTES)
+                .minus(2, ChronoUnit.MINUTES)
                 .isBefore(Instant.now())) {
             // will expire in less than 30 min
+            logger.info("refresh token");
             pushToken(openId, encode(token));
         }
-        return newestToken(openId);
+        logger.info("refreshToken " + getTokenDeque(openId).isEmpty());
+        String newToken = newestToken(openId);
+        logger.info(newToken);
+        return newToken;
         /*
          * actually newly generated token can be returned
          * by override original token parameter and
@@ -60,7 +72,7 @@ public class UserService {
         Instant now = Instant.now();
         return JWT.create()
                 .withIssuedAt(now)
-                .withExpiresAt(now.plus(2, ChronoUnit.HOURS))
+                .withExpiresAt(now.plus(4, ChronoUnit.MINUTES))
                 .withClaim("id", openId)
                 .withClaim("data", salt)
                 .sign(algorithm);
@@ -85,13 +97,16 @@ public class UserService {
     }
 
     private void pushToken(String openId, String token) {
-        getTokenDeque(openId).addLast(token);
+        var q = getTokenDeque(openId);
+        q.addLast(token);
+        logger.info("pushToken " + q.isEmpty());
     }
 
     private Deque<String> getTokenDeque(String openId) {
         tokenTable.putIfAbsent(openId, new LinkedList<>());
         Deque<String> q = tokenTable.get(openId);
         cleanInvalidToken(openId, q);
+        logger.info("getTokenDeque " + q.isEmpty());
         return q;
     }
 
@@ -99,12 +114,17 @@ public class UserService {
         String token;
         while (null != (token = q.peekFirst())) {
             try {
-                if (!openId.equals(decode(token).getClaim("id"))) {
+                if (!openId.equals(decode(token).getClaim("id").asString())) {
+                    logger.info("openId: " + openId);
+                    logger.info("extracted: " + decode(token).getClaim("id").asString());
+                    logger.error("openId != extracted");
                     throw new RuntimeException("token mapping error");
-                }
+                } else break;
             } catch (RuntimeException exception) {
+                logger.error(exception.getMessage());
                 q.removeFirst();
             }
+            logger.info("looping");
         }
     }
 }
