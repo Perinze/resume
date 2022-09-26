@@ -74,7 +74,7 @@ public class UserController {
                         .departmentId(departmentId)
                         .build())
                 .getData().getDepartment();
-        com.unitoken.resume.model.User localUser = userService.getUser(id);
+        com.unitoken.resume.model.User localUser = userService.getLocalUser(id);
 
         ObjectNode root = mapper.createObjectNode();
         root.put("openid", id)

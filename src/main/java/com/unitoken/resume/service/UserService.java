@@ -156,7 +156,7 @@ public class UserService {
         );
     }
 
-    public User getUser(String openId) {
+    public User getLocalUser(String openId) {
         var results = jdbcTemplate.query(
                 "SELECT department_read, department_write, global_read, global_write FROM user WHERE open_id = ?",
                 (ResultSet rs, int rowNum) -> {

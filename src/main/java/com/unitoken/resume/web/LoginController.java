@@ -47,7 +47,7 @@ public class LoginController {
         String userAccessToken = data.get("access_token").asText();
         String token = userService.getToken(openId);
 
-        User user = userService.getUser(openId);
+        User user = userService.getLocalUser(openId);
         if (null == user) userService.addUser(openId);
 
         ObjectNode root = mapper.createObjectNode();

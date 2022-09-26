@@ -37,7 +37,7 @@ public class CvController {
     @GetMapping(value = "/cvs",
             produces = "application/json;charset=UTF-8")
     public String getCv(@RequestHeader Map<String, String> headers) throws JsonProcessingException {
-        User user = userService.getUser(userService.authorize(headers.get("authorization")));
+        User user = userService.getLocalUser(userService.authorize(headers.get("authorization")));
         List<Cv> cvs;
         if (user.getGlobalRead()) {
             logger.info("global read -> getting all cvs");
