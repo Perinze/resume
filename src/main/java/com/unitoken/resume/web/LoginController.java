@@ -34,7 +34,7 @@ public class LoginController {
     @Autowired
     UserService userService;
 
-    @PostMapping(value = "/login",
+    @PostMapping(value = {"/login/common", "/login"},
             consumes = "application/json;charset=UTF-8",
             produces = "application/json;charset=UTF-8")
     @ResponseBody
