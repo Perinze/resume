@@ -147,7 +147,7 @@ public class UserService {
         }
     }
 
-    public List<User> getAllUsers() {
+    public List<User> getAllLocalUsers() {
         return jdbcTemplate.query(
                 "SELECT open_id, department_read, department_write, global_read, global_write FROM user",
                 (ResultSet rs, int rowNum) -> {

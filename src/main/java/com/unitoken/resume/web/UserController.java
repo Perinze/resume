@@ -36,7 +36,7 @@ public class UserController {
     @GetMapping(value = "/users",
             produces = "application/json;charset=UTF-8")
     public String getAllUser() throws Exception {
-        var localUsers = userService.getAllUsers();
+        var localUsers = userService.getAllLocalUsers();
         for (var user : localUsers) {
             String id = user.getOpenId();
             User larkUser = client.contact().user()
