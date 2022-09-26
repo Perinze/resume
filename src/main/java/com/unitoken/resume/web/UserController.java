@@ -5,10 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lark.oapi.Client;
-import com.lark.oapi.service.contact.v3.model.Department;
-import com.lark.oapi.service.contact.v3.model.GetDepartmentReq;
-import com.lark.oapi.service.contact.v3.model.GetUserReq;
-import com.lark.oapi.service.contact.v3.model.User;
 import com.unitoken.resume.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,25 +32,9 @@ public class UserController {
     @GetMapping(value = "/users",
             produces = "application/json;charset=UTF-8")
     public String getAllUser() throws Exception {
-        var localUsers = userService.getAllLocalUsers();
-        for (var user : localUsers) {
-            String id = user.getOpenId();
-            User larkUser = client.contact().user()
-                    .get(GetUserReq.newBuilder()
-                            .userId(id)
-                            .build())
-                    .getData().getUser();
-            String departmentId = larkUser.getDepartmentIds()[0];
-            Department larkDepartment = client.contact().department()
-                    .get(GetDepartmentReq.newBuilder()
-                            .departmentId(departmentId)
-                            .build())
-                    .getData().getDepartment();
-            user.setName(larkUser.getName());
-            user.setDepartment(larkDepartment.getName());
-        }
+        var users = userService.getAllUsers();
 
-        ArrayNode root = mapper.valueToTree(localUsers);
+        ArrayNode root = mapper.valueToTree(users);
         String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
         logger.info(jsonString);
         return jsonString;
@@ -63,27 +43,16 @@ public class UserController {
     @GetMapping(value = "/user/{id}",
             produces = "application/json;charset=UTF-8")
     public String getUser(@PathVariable String id) throws Exception {
-        User larkUser = client.contact().user()
-                .get(GetUserReq.newBuilder()
-                        .userId(id)
-                        .build())
-                .getData().getUser();
-        String departmentId = larkUser.getDepartmentIds()[0];
-        Department larkDepartment = client.contact().department()
-                .get(GetDepartmentReq.newBuilder()
-                        .departmentId(departmentId)
-                        .build())
-                .getData().getDepartment();
-        com.unitoken.resume.model.User localUser = userService.getLocalUser(id);
+        com.unitoken.resume.model.User user = userService.getUser(id);
 
         ObjectNode root = mapper.createObjectNode();
         root.put("openid", id)
-                .put("name", larkUser.getName())
-                .put("department", larkDepartment.getName())
-                .put("department_read", localUser.getDepartmentRead())
-                .put("department_write", localUser.getDepartmentWrite())
-                .put("global_read", localUser.getGlobalRead())
-                .put("global_write", localUser.getGlobalWrite());
+                .put("name", user.getName())
+                .put("department", user.getDepartment())
+                .put("department_read", user.getDepartmentRead())
+                .put("department_write", user.getDepartmentWrite())
+                .put("global_read", user.getGlobalRead())
+                .put("global_write", user.getGlobalWrite());
         String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
         return jsonString;
     }
