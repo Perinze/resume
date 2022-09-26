@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class CvService {
@@ -36,6 +37,12 @@ public class CvService {
             cv.setComments(getComments(cv));
         }
         return cvs;
+    }
+
+    public List<Cv> getByDepartment(String department) {
+        return getAll().stream().filter(cv ->
+            cv.getDepartment() == department
+        ).collect(Collectors.toList());
     }
 
     public Cv getById(Long id) {
