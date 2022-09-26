@@ -40,6 +40,7 @@ public class UserService {
     Logger logger = LoggerFactory.getLogger(getClass());
 
     private Map<String, Deque<String>> tokenTable = new HashMap<>();
+    private Map<String, String> invTokenTable = new HashMap<>();
 
     // always return a valid token
     public String getToken(String openId) {
@@ -108,6 +109,7 @@ public class UserService {
     private void pushToken(String openId, String token) {
         var q = getTokenDeque(openId);
         q.addLast(token);
+        invTokenTable.put(token, openId);
         logger.info("pushToken " + q.isEmpty());
     }
 
@@ -132,6 +134,7 @@ public class UserService {
             } catch (RuntimeException exception) {
                 logger.error(exception.getMessage());
                 q.removeFirst();
+                invTokenTable.remove(token, openId);
             }
             logger.info("looping");
         }
@@ -168,6 +171,9 @@ public class UserService {
                 },
                 openId
         );
+        logger.info("getUser results is empty: " + results.isEmpty());
+        logger.info("getUser results is null: " + (results == null));
+        logger.info("getUser results.get(0): " + results.get(0).getName());
         return results.isEmpty() ? null : results.get(0);
     }
 
@@ -208,5 +214,11 @@ public class UserService {
         )) {
             throw new RuntimeException("failed to modify user");
         }
+    }
+
+    public String authorize(String token) {
+        String openId = invTokenTable.get(token);
+        logger.info("token auth: " + openId);
+        return openId;
     }
 }

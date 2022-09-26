@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -98,5 +99,14 @@ public class UserController {
                 body.get("global_write").asBoolean()
         );
         userService.modifyUser(user);
+    }
+
+    @GetMapping(value = "/auth",
+            produces = "application/json;charset=UTF-8")
+    public void auth(@RequestHeader Map<String, String> header) {
+        String token = header.get("authorization");
+        logger.info("token: " + token);
+        String openId = userService.authorize(token);
+        logger.info(openId);
     }
 }
