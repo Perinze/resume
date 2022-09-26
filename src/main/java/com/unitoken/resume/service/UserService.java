@@ -163,6 +163,14 @@ public class UserService {
         );
     }
 
+    public List<User> getAllUsers() throws Exception {
+        var users = getAllLocalUsers();
+        for (var user : users) {
+            larkUser(user);
+        }
+        return users;
+    }
+
     public User getLocalUser(String openId) {
         var results = jdbcTemplate.query(
                 "SELECT department_read, department_write, global_read, global_write FROM user WHERE open_id = ?",
@@ -185,6 +193,13 @@ public class UserService {
     }
 
     public User getUser(String openId) throws Exception {
+        User user = getLocalUser(openId);
+        larkUser(user);
+        return user;
+    }
+
+    private void larkUser(User user) throws Exception {
+        String openId = user.getOpenId();
         com.lark.oapi.service.contact.v3.model.User larkUser = client.contact().user()
                 .get(GetUserReq.newBuilder()
                         .userId(openId)
@@ -197,10 +212,8 @@ public class UserService {
                         .build())
                 .getData().getDepartment();
 
-        User user = getLocalUser(openId);
         user.setName(larkUser.getName());
         user.setDepartment(larkDepartment.getName());
-        return user;
     }
 
     public void addUser(String openId) {
