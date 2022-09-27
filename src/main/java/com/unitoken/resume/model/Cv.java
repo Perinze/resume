@@ -1,24 +1,24 @@
 package com.unitoken.resume.model;
 
+import com.unitoken.resume.model.Comment;
+import com.unitoken.resume.model.LocalAbstractModel;
+
+import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Cv {
-    Long id;
+@Entity
+@Table(name = "cv")
+public class Cv extends LocalAbstractModel {
     String author;
-    String department;
     String content;
     String state;
+    String departmentId;
+    Timestamp createAt;
     List<Comment> comments;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+    @Column(nullable = false)
     public String getAuthor() {
         return author;
     }
@@ -27,6 +27,7 @@ public class Cv {
         this.author = author;
     }
 
+    @Column(nullable = false)
     public String getContent() {
         return content;
     }
@@ -35,6 +36,7 @@ public class Cv {
         this.content = content;
     }
 
+    @Column(nullable = false)
     public String getState() {
         return state;
     }
@@ -43,14 +45,16 @@ public class Cv {
         this.state = state;
     }
 
-    public String getDepartment() {
-        return department;
+    @Column(nullable = false)
+    public String getDepartmentId() {
+        return departmentId;
     }
 
-    public void setDepartment(String department) {
-        this.department = department;
+    public void setDepartmentId(String departmentId) {
+        this.departmentId = departmentId;
     }
 
+    @Transient
     public List<Comment> getComments() {
         return comments;
     }
@@ -59,24 +63,25 @@ public class Cv {
         this.comments = comments;
     }
 
-    public Cv(Long id, String author, String department, String content, String state) {
-        this.id = id;
+    public Cv() {
+
+    }
+
+    public Cv(String author, String departmentId, String content) {
         this.author = author;
-        this.department = department;
+        this.departmentId = departmentId;
         this.content = content;
-        this.state = state;
-        this.comments = new ArrayList<>();
     }
 
     @Override
     public String toString() {
         return "Cv{" +
-                "id=" + id +
-                ", author='" + author + '\'' +
-                ", department='" + department + '\'' +
-                ", content='" + content + '\'' +
-                ", state='" + state + '\'' +
-                ", comments=" + comments +
+                "id=" + getId() +
+                ", author='" + getAuthor() + '\'' +
+                ", departmentId='" + getDepartmentId() + '\'' +
+                ", content='" + getContent() + '\'' +
+                ", state='" + getState() + '\'' +
+                ", comments=" + getComments() +
                 '}';
     }
 }
