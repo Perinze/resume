@@ -97,7 +97,6 @@ public class CvController {
             consumes = "application/json;charset=UTF-8")
     public void postComment(@PathVariable Long id, @RequestBody JsonNode commentNode) {
         Comment comment = new Comment(
-                0L,
                 id,
                 commentNode.get("author").asText(),
                 commentNode.get("content").asText()

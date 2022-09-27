@@ -1,44 +1,26 @@
 package com.unitoken.resume.model;
 
-public class Comment {
-    Long id;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "comment")
+public class Comment extends LocalAbstractModel {
     Long cvId;
     String author;
     String content;
 
-    public Comment(Long id, Long cvId, String author, String content) {
-        this.id = id;
-        this.cvId = cvId;
-        this.author = author;
-        this.content = content;
-    }
-
-    @Override
-    public String toString() {
-        return "Comment{" +
-                "id=" + id +
-                ", cvId=" + cvId +
-                ", author='" + author + '\'' +
-                ", content='" + content + '\'' +
-                '}';
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getCv_id() {
+    @Column(nullable = false, name = "cv_id")
+    public Long getCvId() {
         return cvId;
     }
 
-    public void setCv_id(Long cvId) {
+    public void setCvId(Long cvId) {
         this.cvId = cvId;
     }
 
+    @Column(nullable = false)
     public String getAuthor() {
         return author;
     }
@@ -47,11 +29,32 @@ public class Comment {
         this.author = author;
     }
 
+    @Column(nullable = false)
     public String getContent() {
         return content;
     }
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public Comment() {
+
+    }
+
+    public Comment(Long cvId, String author, String content) {
+        this.cvId = cvId;
+        this.author = author;
+        this.content = content;
+    }
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "id=" + super.getId() +
+                ", cvId=" + getCvId() +
+                ", author='" + getAuthor() + '\'' +
+                ", content='" + getAuthor() + '\'' +
+                '}';
     }
 }

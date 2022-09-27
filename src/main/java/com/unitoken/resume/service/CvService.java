@@ -59,6 +59,7 @@ public class CvService {
     }
 
     public List<Comment> getComments(Cv cv) {
+        /*
         return jdbcTemplate.query(
                 "SELECT id, cv_id, author, content FROM comment WHERE cv_id = ?",
                 (ResultSet rs, int rowNum) -> {
@@ -72,9 +73,13 @@ public class CvService {
                 },
                 cv.getId()
         );
+         */
+        List<Comment> comments = db.from(Comment.class).where("cv_id = ?", cv.getId()).list();
+        return comments;
     }
 
     public void insertComment(Long cvId, Comment comment) {
+        /*
         KeyHolder holder = new GeneratedKeyHolder();
         if (1 != jdbcTemplate.update(
                 (conn) -> {
@@ -91,5 +96,8 @@ public class CvService {
             throw new RuntimeException("failed to insert comment");
         }
         comment.setId(holder.getKey().longValue());
+         */
+        comment.setCvId(cvId);
+        db.insert(comment);
     }
 }
