@@ -4,10 +4,10 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.beans.Transient;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
