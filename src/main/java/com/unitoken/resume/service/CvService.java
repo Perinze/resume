@@ -1,5 +1,6 @@
 package com.unitoken.resume.service;
 
+import com.unitoken.resume.database.DbTemplate;
 import com.unitoken.resume.model.Comment;
 import com.unitoken.resume.model.Cv;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,96 +20,42 @@ public class CvService {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    DbTemplate db;
+
     public List<Cv> getAll() {
-        List<Cv> cvs = jdbcTemplate.query(
-                "SELECT id, author, department, content, state FROM cv",
-                (ResultSet rs, int rowNum) -> {
-                    // TODO check if result set is empty
-                    return new Cv(
-                            rs.getLong("id"),
-                            rs.getString("author"),
-                            rs.getString("department"),
-                            rs.getString("content"),
-                            rs.getString("state")
-                    );
-                }
-        );
+        List<Cv> cvs = db.from(Cv.class).list();
         for (Cv cv : cvs) {
             cv.setComments(getComments(cv));
         }
         return cvs;
     }
 
-    public List<Cv> getByDepartment(String department) {
+    public List<Cv> getByDepartment(String departmentId) {
         return getAll().stream().filter(cv ->
-            cv.getDepartment() == department
+            cv.getDepartmentId() == departmentId
         ).collect(Collectors.toList());
     }
 
     public Cv getById(Long id) {
-        Cv cv = jdbcTemplate.query(
-                "SELECT id, author, department, content, state FROM cv WHERE id = ?",
-                (ResultSet rs, int rowNum) -> {
-                    // TODO check if result set is empty
-                    return new Cv(
-                            rs.getLong("id"),
-                            rs.getString("author"),
-                            rs.getString("department"),
-                            rs.getString("content"),
-                            rs.getString("state")
-                    );
-                },
-                id
-        ).get(0);
+        Cv cv = db.from(Cv.class).where("id = ?", id).unique();
         cv.setComments(getComments(cv));
         return cv;
     }
 
     public void insertCv(Cv cv) {
-        KeyHolder holder = new GeneratedKeyHolder();
-        if (1 != jdbcTemplate.update(
-                (conn) -> {
-                    var ps = conn.prepareStatement(
-                            "INSERT INTO cv (author, department, content, state) VALUES (?, ?, ?, ?)",
-                            Statement.RETURN_GENERATED_KEYS);
-                    ps.setString(1, cv.getAuthor());
-                    ps.setString(2, cv.getDepartment());
-                    ps.setString(3, cv.getContent());
-                    ps.setString(4, cv.getState());
-                    return ps;
-                },
-                holder
-        )) {
-            throw new RuntimeException("failed to insert cv");
-        }
-        cv.setId(holder.getKey().longValue());
+        cv.setState("unchecked");
+        db.insert(cv);
     }
 
     public void modifyState(Long id, String state) {
-        if (1 != jdbcTemplate.update(
-                (conn) -> {
-                    var ps = conn.prepareStatement(
-                            "UPDATE cv SET state = ? WHERE id = ?");
-                    ps.setString(1, state);
-                    ps.setLong(2, id);
-                    return ps;
-                }
-        )) {
-            throw new RuntimeException("failed to modify cv state");
-        }
+        Cv cv = db.from(Cv.class).where("id = ?", id).unique();
+        cv.setState(state);
+        db.update(cv);
     }
 
     public void deleteCv(Long id) {
-        if (1 != jdbcTemplate.update(
-                (conn) -> {
-                    var ps = conn.prepareStatement(
-                            "DELETE FROM cv WHERE id = ?");
-                    ps.setLong(1, id);
-                    return ps;
-                }
-        )) {
-            throw new RuntimeException("failed to delete cv");
-        }
+        db.delete(Cv.class, id);
     }
 
     public List<Comment> getComments(Cv cv) {

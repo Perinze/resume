@@ -45,7 +45,7 @@ public class Cv extends LocalAbstractModel {
         this.state = state;
     }
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "department_id")
     public String getDepartmentId() {
         return departmentId;
     }

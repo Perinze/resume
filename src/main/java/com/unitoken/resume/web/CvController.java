@@ -36,9 +36,10 @@ public class CvController {
 
     @GetMapping(value = "/cvs",
             produces = "application/json;charset=UTF-8")
-    public String getCv(@RequestHeader Map<String, String> headers) throws JsonProcessingException {
-        User user = userService.getUser(userService.authorize(headers.get("authorization")));
+    public String getCv(@RequestHeader Map<String, String> headers, @RequestParam Map<String, String> params) throws JsonProcessingException {
         List<Cv> cvs;
+        /*
+        User user = userService.getUser(userService.authorize(headers.get("authorization")));
         if (user.getGlobalRead()) {
             logger.info("global read -> getting all cvs");
             cvs = cvService.getAll();
@@ -48,6 +49,8 @@ public class CvController {
         } else {
             throw new PermissionDenied();
         }
+         */
+        cvs = cvService.getAll();
         ArrayNode root = mapper.valueToTree(cvs);
         String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
         logger.info(jsonString);
@@ -69,11 +72,9 @@ public class CvController {
         consumes = "application/json;charset=UTF-8")
     public void postCv(@RequestBody JsonNode cvNode) {
         Cv cv = new Cv(
-                0L,
                 cvNode.get("author").asText(),
-                cvNode.get("department").asText(),
-                cvNode.get("content").asText(),
-                "unchecked"
+                cvNode.get("department_id").asText(),
+                cvNode.get("content").asText()
         );
         cvService.insertCv(cv);
         logger.info(cv.toString());
