@@ -5,11 +5,14 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lark.oapi.Client;
+import com.unitoken.resume.database.DbTemplate;
+import com.unitoken.resume.model.LocalAbstractModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
 import java.text.SimpleDateFormat;
@@ -67,5 +70,10 @@ public class ResumeApplication {
 		return JWT.require(algorithm)
 				.withClaim("data", salt)
 				.build();
+	}
+
+	@Bean
+	DbTemplate createDbTemplate(@Autowired JdbcTemplate jdbcTemplate) {
+		return new DbTemplate(jdbcTemplate, LocalAbstractModel.class.getPackageName());
 	}
 }
