@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.unitoken.resume.database.DbTemplate;
+import com.unitoken.resume.database.Where;
 import com.unitoken.resume.exception.PermissionDenied;
 import com.unitoken.resume.model.Comment;
 import com.unitoken.resume.model.Cv;
@@ -16,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -32,25 +34,42 @@ public class CvController {
     @Autowired
     ObjectMapper mapper;
 
+    @Autowired
+    DbTemplate db;
+
     Logger logger = LoggerFactory.getLogger(getClass());
 
     @GetMapping(value = "/cvs",
             produces = "application/json;charset=UTF-8")
-    public String getCv(@RequestHeader Map<String, String> headers, @RequestParam Map<String, String> params) throws JsonProcessingException {
-        List<Cv> cvs;
-        /*
-        User user = userService.getUser(userService.authorize(headers.get("authorization")));
+    public String getCv(@RequestHeader Map<String, String> headers, @RequestParam Map<String, String> params) throws Exception {
+        var from = db.from(Cv.class);
+        Where<Cv> where = from.where("true");
+
+        String token = headers.get("authorization");
+        if (token == null) {
+            throw new PermissionDenied();
+        }
+        User user = userService.getUser(userService.authorize(token));
         if (user.getGlobalRead()) {
             logger.info("global read -> getting all cvs");
-            cvs = cvService.getAll();
         } else if (user.getDepartmentRead()) {
             logger.info("department read -> getting department cvs");
-            cvs = cvService.getByDepartment(user.getDepartment());
+            logger.info("department id: " + user.getDepartmentId());
+            where = where.where("department_id = ?", user.getDepartmentId());
         } else {
             throw new PermissionDenied();
         }
-         */
-        cvs = cvService.getAll();
+
+        String after = params.get("after");
+        if (after != null) {
+            where = where.where("create_at > ?", Timestamp.valueOf(after));
+        }
+        String before = params.get("before");
+        if (before != null) {
+            where = where.where("create_at < ?", Timestamp.valueOf(before));
+        }
+
+        List<Cv> cvs = where.list();
         ArrayNode root = mapper.valueToTree(cvs);
         String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
         logger.info(jsonString);
