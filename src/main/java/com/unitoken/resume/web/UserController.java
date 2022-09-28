@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @CrossOrigin
@@ -45,13 +44,8 @@ public class UserController {
                             .build())
                     .getData().getUser();
             String departmentId = larkUser.getDepartmentIds()[0];
-            Department larkDepartment = client.contact().department()
-                    .get(GetDepartmentReq.newBuilder()
-                            .departmentId(departmentId)
-                            .build())
-                    .getData().getDepartment();
             user.setName(larkUser.getName());
-            user.setDepartment(larkDepartment.getName());
+            user.setDepartmentId(departmentId);
         }
 
         ArrayNode root = mapper.valueToTree(localUsers);
@@ -90,14 +84,12 @@ public class UserController {
 
     @PatchMapping(value = "/user/{id}",
             consumes = "application/json;charset=UTF-8")
-    public void patchUser(@PathVariable String id, @RequestBody JsonNode body) {
-        var user = new com.unitoken.resume.model.User(
-                id,
-                body.get("department_read").asBoolean(),
-                body.get("department_write").asBoolean(),
-                body.get("global_read").asBoolean(),
-                body.get("global_write").asBoolean()
-        );
+    public void patchUser(@PathVariable String id, @RequestBody JsonNode body) throws Exception {
+        var user = userService.getUser(id);
+        user.setDepartmentRead(body.get("department_read") == null ? user.getDepartmentRead() : body.get("department_read").asBoolean());
+        user.setDepartmentWrite(body.get("department_write") == null ? user.getDepartmentWrite() : body.get("department_write").asBoolean());
+        user.setGlobalRead(body.get("global_read") == null ? user.getGlobalRead() : body.get("global_read").asBoolean());
+        user.setGlobalWrite(body.get("global_write") == null ? user.getGlobalWrite() : body.get("global_write").asBoolean());
         userService.modifyUser(user);
     }
 
