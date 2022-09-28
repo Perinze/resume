@@ -14,12 +14,18 @@ public final class Where<T> extends CriteriaQuery<T> {
 
     Where(Criteria<T> criteria, String clause, Object... params) {
         super(criteria);
-        this.criteria.where = clause;
-        this.criteria.whereParams = new ArrayList<>();
+        this.criteria.where += clause;
+        System.out.println("clause " + clause);
+        System.out.println("where " + this.criteria.where);
+        //this.criteria.whereParams = new ArrayList<>();
         // add:
         for (Object param : params) {
             this.criteria.whereParams.add(param);
         }
+    }
+
+    public Where<T> where(String clause, Object... args) {
+        return new Where<>(this.criteria, " AND " + clause, args);
     }
 
     public Limit<T> limit(int maxResults) {

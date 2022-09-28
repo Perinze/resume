@@ -20,8 +20,8 @@ final class Criteria<T> {
     List<String> select = null;
     boolean distinct = false;
     String table = null;
-    String where = null;
-    List<Object> whereParams = null;
+    String where = "";
+    List<Object> whereParams = new ArrayList<>();
     List<String> orderBy = null;
     int offset = 0;
     int maxResults = 0;
@@ -35,7 +35,7 @@ final class Criteria<T> {
         sb.append("SELECT ");
         sb.append((select == null ? "*" : String.join(", ", select)));
         sb.append(" FROM ").append(mapper.tableName);
-        if (where != null) {
+        if (where != null && where != "") {
             sb.append(" WHERE ").append(String.join(" ", where));
         }
         if (orderBy != null) {
@@ -45,12 +45,13 @@ final class Criteria<T> {
             sb.append(" LIMIT ?, ?");
         }
         String s = sb.toString();
+        System.out.println(s);
         return s;
     }
 
     Object[] params() {
         List<Object> params = new ArrayList<>();
-        if (where != null) {
+        if (where != null && where != "") {
             for (Object obj : whereParams) {
                 if (obj == null) {
                     params.add(null);
