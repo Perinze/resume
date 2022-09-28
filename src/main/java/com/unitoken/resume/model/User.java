@@ -15,6 +15,10 @@ public class User extends SyncAbstractModel {
     Boolean globalRead;
     Boolean globalWrite;
 
+    public User() {
+
+    }
+
     public User(String openId, Boolean departmentRead, Boolean departmentWrite, Boolean globalRead, Boolean globalWrite) {
         super.setOpenId(openId);
         this.departmentRead = departmentRead;
@@ -73,7 +77,7 @@ public class User extends SyncAbstractModel {
         return departmentId;
     }
 
-    public void setDepartment(String departmentId) {
+    public void setDepartmentId(String departmentId) {
         this.departmentId = departmentId;
     }
 }
