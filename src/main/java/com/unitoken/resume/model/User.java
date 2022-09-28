@@ -27,7 +27,7 @@ public class User extends SyncAbstractModel {
         this.globalWrite = globalWrite;
     }
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "department_read")
     public Boolean getDepartmentRead() {
         return departmentRead;
     }
@@ -36,7 +36,7 @@ public class User extends SyncAbstractModel {
         this.departmentRead = departmentRead;
     }
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "department_write")
     public Boolean getDepartmentWrite() {
         return departmentWrite;
     }
@@ -45,7 +45,7 @@ public class User extends SyncAbstractModel {
         this.departmentWrite = departmentWrite;
     }
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "global_read")
     public Boolean getGlobalRead() {
         return globalRead;
     }
@@ -54,7 +54,7 @@ public class User extends SyncAbstractModel {
         this.globalRead = globalRead;
     }
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "global_write")
     public Boolean getGlobalWrite() {
         return globalWrite;
     }
@@ -63,7 +63,7 @@ public class User extends SyncAbstractModel {
         this.globalWrite = globalWrite;
     }
 
-    @Column(nullable = false)
+    @Transient
     public String getName() {
         return name;
     }
