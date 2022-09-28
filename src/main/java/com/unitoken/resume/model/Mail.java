@@ -37,6 +37,12 @@ public class Mail extends LocalAbstractModel {
         this.content = content;
     }
 
+    public Mail(Long id, String author, String content) {
+        super.setId(id);
+        this.author = author;
+        this.content = content;
+    }
+
     @Override
     public String toString() {
         return "Mail{" +

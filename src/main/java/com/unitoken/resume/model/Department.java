@@ -13,6 +13,11 @@ public class Department extends SyncAbstractModel {
 
     }
 
+    public Department(String openId) {
+        super.setOpenId(openId);
+        this.mailId = 1L;
+    }
+
     public Department(String openId, Long mailId) {
         super.setOpenId(openId);
         this.mailId = mailId;

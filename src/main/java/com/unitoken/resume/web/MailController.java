@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.MissingFormatArgumentException;
 
 @CrossOrigin
 @RestController
@@ -52,7 +51,6 @@ public class MailController {
             consumes = "application/json;charset=UTF-8")
     public void postMail(@RequestBody JsonNode mailNode) {
         Mail mail = new Mail(
-                0L,
                 mailNode.get("author").asText(),
                 mailNode.get("content").asText()
         );
