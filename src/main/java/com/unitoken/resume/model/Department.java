@@ -1,30 +1,32 @@
 package com.unitoken.resume.model;
 
-public class Department {
-    String openId;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "department")
+public class Department extends SyncAbstractModel {
     Long mailId;
 
-    public Department(Long id, String openId, Long mailId) {
-        this.openId = openId;
+    public Department() {
+
+    }
+
+    public Department(String openId, Long mailId) {
+        super.setOpenId(openId);
         this.mailId = mailId;
     }
 
     @Override
     public String toString() {
         return "Department{" +
-                ", openId='" + openId + '\'' +
-                ", mailId=" + mailId +
+                ", openId='" + super.getOpenId() + '\'' +
+                ", mailId=" + this.getMailId() +
                 '}';
     }
 
-    public String getOpenId() {
-        return openId;
-    }
-
-    public void setOpenId(String openId) {
-        this.openId = openId;
-    }
-
+    @Column(nullable = false, name = "mail_id")
     public Long getMailId() {
         return mailId;
     }

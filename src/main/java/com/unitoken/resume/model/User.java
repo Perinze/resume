@@ -1,30 +1,29 @@
 package com.unitoken.resume.model;
 
-public class User {
-    String openId;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@Table(name = "user")
+public class User extends SyncAbstractModel {
     String name;
-    String department;
+    String departmentId;
     Boolean departmentRead;
     Boolean departmentWrite;
     Boolean globalRead;
     Boolean globalWrite;
 
     public User(String openId, Boolean departmentRead, Boolean departmentWrite, Boolean globalRead, Boolean globalWrite) {
-        this.openId = openId;
+        super.setOpenId(openId);
         this.departmentRead = departmentRead;
         this.departmentWrite = departmentWrite;
         this.globalRead = globalRead;
         this.globalWrite = globalWrite;
     }
 
-    public String getOpenId() {
-        return openId;
-    }
-
-    public void setOpenId(String openId) {
-        this.openId = openId;
-    }
-
+    @Column(nullable = false)
     public Boolean getDepartmentRead() {
         return departmentRead;
     }
@@ -33,6 +32,7 @@ public class User {
         this.departmentRead = departmentRead;
     }
 
+    @Column(nullable = false)
     public Boolean getDepartmentWrite() {
         return departmentWrite;
     }
@@ -41,6 +41,7 @@ public class User {
         this.departmentWrite = departmentWrite;
     }
 
+    @Column(nullable = false)
     public Boolean getGlobalRead() {
         return globalRead;
     }
@@ -49,6 +50,7 @@ public class User {
         this.globalRead = globalRead;
     }
 
+    @Column(nullable = false)
     public Boolean getGlobalWrite() {
         return globalWrite;
     }
@@ -57,6 +59,7 @@ public class User {
         this.globalWrite = globalWrite;
     }
 
+    @Column(nullable = false)
     public String getName() {
         return name;
     }
@@ -65,11 +68,12 @@ public class User {
         this.name = name;
     }
 
-    public String getDepartment() {
-        return department;
+    @Transient
+    public String getDepartmentId() {
+        return departmentId;
     }
 
-    public void setDepartment(String department) {
-        this.department = department;
+    public void setDepartment(String departmentId) {
+        this.departmentId = departmentId;
     }
 }

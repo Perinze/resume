@@ -1,33 +1,16 @@
 package com.unitoken.resume.model;
 
-public class Mail {
-    Long id;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "mail")
+public class Mail extends LocalAbstractModel {
     String author;
     String content;
 
-    public Mail(Long id, String author, String content) {
-        this.id = id;
-        this.author = author;
-        this.content = content;
-    }
-
-    @Override
-    public String toString() {
-        return "Mail{" +
-                "id=" + id +
-                ", author='" + author + '\'' +
-                ", content='" + content + '\'' +
-                '}';
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+    @Column(nullable = false)
     public String getAuthor() {
         return author;
     }
@@ -36,11 +19,29 @@ public class Mail {
         this.author = author;
     }
 
+    @Column(nullable = false)
     public String getContent() {
         return content;
     }
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public Mail() {
+
+    }
+
+    public Mail(String author, String content) {
+        this.author = author;
+        this.content = content;
+    }
+
+    @Override
+    public String toString() {
+        return "Mail{" +
+                ", author='" + author + '\'' +
+                ", content='" + content + '\'' +
+                '}';
     }
 }
