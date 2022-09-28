@@ -1,11 +1,7 @@
 package com.unitoken.resume.model;
 
-import com.unitoken.resume.model.Comment;
-import com.unitoken.resume.model.LocalAbstractModel;
-
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -52,6 +48,15 @@ public class Cv extends LocalAbstractModel {
 
     public void setDepartmentId(String departmentId) {
         this.departmentId = departmentId;
+    }
+
+    @Column(nullable = false, insertable = false, name = "create_at")
+    public Timestamp getCreateAt() {
+        return createAt;
+    }
+
+    public void setCreateAt(Timestamp createAt) {
+        this.createAt = createAt;
     }
 
     @Transient
