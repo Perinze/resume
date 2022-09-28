@@ -5,20 +5,16 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.lark.oapi.Client;
+import com.lark.oapi.service.contact.v3.model.GetUserReq;
 import com.unitoken.resume.database.DbTemplate;
 import com.unitoken.resume.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -40,6 +36,9 @@ public class UserService {
 
     @Autowired
     DbTemplate db;
+
+    @Autowired
+    Client client;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -149,8 +148,15 @@ public class UserService {
         return users;
     }
 
-    public User getUser(String openId) {
+    public User getUser(String openId) throws Exception {
+        var larkUser = client.contact().user()
+                .get(GetUserReq.newBuilder()
+                        .userId(openId)
+                        .build())
+                .getData().getUser();
+        String departmentId = larkUser.getDepartmentIds()[0];
         User user = db.from(User.class).where("open_id = ?", openId).first();
+        user.setDepartmentId(departmentId);
         return user;
     }
 
