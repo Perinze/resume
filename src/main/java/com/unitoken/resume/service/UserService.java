@@ -160,6 +160,18 @@ public class UserService {
         return user;
     }
 
+    private void larkUser(User user) throws Exception {
+        String openId = user.getOpenId();
+        com.lark.oapi.service.contact.v3.model.User larkUser = client.contact().user()
+                .get(GetUserReq.newBuilder()
+                        .userId(openId)
+                        .build())
+                .getData().getUser();
+        String departmentId = larkUser.getDepartmentIds()[0];
+        user.setName(larkUser.getName());
+        user.setDepartmentId(departmentId);
+    }
+
     public void addUser(String openId) {
         User user = new User(openId, true, false, false, false);
         db.insert(user);
