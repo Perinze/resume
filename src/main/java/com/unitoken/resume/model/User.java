@@ -10,6 +10,7 @@ import javax.persistence.Transient;
 public class User extends SyncAbstractModel {
     String name;
     String departmentId;
+    String department;
     Boolean departmentRead;
     Boolean departmentWrite;
     Boolean globalRead;
@@ -79,5 +80,14 @@ public class User extends SyncAbstractModel {
 
     public void setDepartmentId(String departmentId) {
         this.departmentId = departmentId;
+    }
+
+    @Transient
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 }

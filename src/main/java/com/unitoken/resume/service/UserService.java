@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.lark.oapi.Client;
+import com.lark.oapi.service.contact.v3.model.GetDepartmentReq;
 import com.lark.oapi.service.contact.v3.model.GetUserReq;
 import com.unitoken.resume.database.DbTemplate;
 import com.unitoken.resume.model.User;
@@ -154,9 +155,22 @@ public class UserService {
                         .userId(openId)
                         .build())
                 .getData().getUser();
+
+        String name = larkUser.getName();
         String departmentId = larkUser.getDepartmentIds()[0];
+
+        var larkDepartment = client.contact().department()
+                .get(GetDepartmentReq.newBuilder()
+                        .departmentId(departmentId)
+                        .build())
+                .getData().getDepartment();
+
+        String department = larkDepartment.getName();
+
         User user = db.from(User.class).where("open_id = ?", openId).first();
+        user.setName(name);
         user.setDepartmentId(departmentId);
+        user.setDepartment(department);
         return user;
     }
 

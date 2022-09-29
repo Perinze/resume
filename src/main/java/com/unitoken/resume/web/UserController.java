@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lark.oapi.Client;
+import com.lark.oapi.service.contact.v3.model.Department;
+import com.lark.oapi.service.contact.v3.model.GetDepartmentReq;
 import com.lark.oapi.service.contact.v3.model.GetUserReq;
 import com.lark.oapi.service.contact.v3.model.User;
 import com.unitoken.resume.service.UserService;
@@ -42,8 +44,14 @@ public class UserController {
                             .build())
                     .getData().getUser();
             String departmentId = larkUser.getDepartmentIds()[0];
+            Department larkDepartment = client.contact().department()
+                    .get(GetDepartmentReq.newBuilder()
+                            .departmentId(departmentId)
+                            .build())
+                    .getData().getDepartment();
             user.setName(larkUser.getName());
             user.setDepartmentId(departmentId);
+            user.setDepartment(larkDepartment.getName());
         }
 
         ArrayNode root = mapper.valueToTree(localUsers);
@@ -57,14 +65,7 @@ public class UserController {
     public String getUser(@PathVariable String id) throws Exception {
         com.unitoken.resume.model.User user = userService.getUser(id);
 
-        ObjectNode root = mapper.createObjectNode();
-        root.put("openid", id)
-                .put("name", user.getName())
-                .put("department_id", user.getDepartmentId())
-                .put("department_read", user.getDepartmentRead())
-                .put("department_write", user.getDepartmentWrite())
-                .put("global_read", user.getGlobalRead())
-                .put("global_write", user.getGlobalWrite());
+        ObjectNode root = mapper.valueToTree(user);
         String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
         return jsonString;
     }
