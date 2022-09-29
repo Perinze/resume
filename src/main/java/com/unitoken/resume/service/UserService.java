@@ -13,6 +13,7 @@ import com.unitoken.resume.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +37,9 @@ public class UserService {
     JdbcTemplate jdbcTemplate;
 
     @Autowired
+    RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
     DbTemplate db;
 
     @Autowired
@@ -43,8 +47,8 @@ public class UserService {
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Map<String, Deque<String>> tokenTable = new HashMap<>();
-    private Map<String, String> invTokenTable = new HashMap<>();
+    //private Map<String, Deque<String>> tokenTable = new HashMap<>();
+    //private Map<String, String> invTokenTable = new HashMap<>();
 
     // always return a valid token
     public String getToken(String openId) {
@@ -107,27 +111,36 @@ public class UserService {
     }
 
     private String newestToken(String openId) {
-        return getTokenDeque(openId).peekLast();
+        //return getTokenDeque(openId).peekLast();
+        var list =  redisTemplate.opsForList().range(openId, -1, -1);
+        if (null == list || list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
     }
 
     private void pushToken(String openId, String token) {
-        var q = getTokenDeque(openId);
-        q.addLast(token);
-        invTokenTable.put(token, openId);
-        logger.info("pushToken " + q.isEmpty());
+        //String q = getTokenDeque(openId);
+        //q.addLast(token);
+        redisTemplate.opsForList().rightPush(openId, token);
+        //invTokenTable.put(token, openId);
+        redisTemplate.opsForValue().set(token, openId);
+        //logger.info("pushToken " + q.isEmpty());
     }
 
-    private Deque<String> getTokenDeque(String openId) {
-        tokenTable.putIfAbsent(openId, new LinkedList<>());
-        Deque<String> q = tokenTable.get(openId);
-        cleanInvalidToken(openId, q);
-        logger.info("getTokenDeque " + q.isEmpty());
-        return q;
+    private String getTokenDeque(String openId) {
+        //tokenTable.putIfAbsent(openId, new LinkedList<>());
+        //Deque<String> q = tokenTable.get(openId);
+        cleanInvalidToken(openId, openId);
+        //logger.info("getTokenDeque " + q.isEmpty());
+        return openId;
     }
 
-    private void cleanInvalidToken(String openId, Deque<String> q) {
+    //private void cleanInvalidToken(String openId, Deque<String> q) {
+    private void cleanInvalidToken(String openId, String key) {
         String token;
-        while (null != (token = q.peekFirst())) {
+        //while (null != (token = q.peekFirst())) {
+        while (null != (token = redisTemplate.opsForList().index(key, 0))) {
             try {
                 if (!openId.equals(decode(token).getClaim("id").asString())) {
                     logger.info("openId: " + openId);
@@ -137,16 +150,17 @@ public class UserService {
                 } else break;
             } catch (RuntimeException exception) {
                 logger.error(exception.getMessage());
-                q.removeFirst();
-                invTokenTable.remove(token, openId);
+                //q.removeFirst();
+                redisTemplate.opsForList().leftPop(key);
+                //invTokenTable.remove(token, openId);
+                redisTemplate.opsForValue().getAndDelete(token);
             }
             logger.info("looping");
         }
     }
 
     public List<User> getAllUsers() {
-        List<User> users = db.from(User.class).list();
-        return users;
+        return db.from(User.class).list();
     }
 
     public User getUser(String openId) throws Exception {
@@ -174,6 +188,7 @@ public class UserService {
         return user;
     }
 
+    /*
     private void larkUser(User user) throws Exception {
         String openId = user.getOpenId();
         com.lark.oapi.service.contact.v3.model.User larkUser = client.contact().user()
@@ -185,6 +200,7 @@ public class UserService {
         user.setName(larkUser.getName());
         user.setDepartmentId(departmentId);
     }
+     */
 
     public void addUser(String openId) {
         User user = new User(openId, true, false, false, false);
@@ -196,7 +212,8 @@ public class UserService {
     }
 
     public String authorize(String token) {
-        String openId = invTokenTable.get(token);
+        //String openId = invTokenTable.get(token);
+        String openId = redisTemplate.opsForValue().get(token);
         logger.info("token auth: " + openId);
         return openId;
     }
