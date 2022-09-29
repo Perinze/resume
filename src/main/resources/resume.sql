@@ -1,8 +1,8 @@
--- MariaDB dump 10.19  Distrib 10.9.2-MariaDB, for Linux (x86_64)
+-- MariaDB dump 10.19  Distrib 10.9.3-MariaDB, for Linux (x86_64)
 --
 -- Host: localhost    Database: resume_dev
 -- ------------------------------------------------------
--- Server version	10.9.2-MariaDB
+-- Server version	10.9.3-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -30,7 +30,7 @@ CREATE TABLE `comment` (
   PRIMARY KEY (`id`),
   KEY `cv_id` (`cv_id`),
   CONSTRAINT `comment_ibfk_1` FOREIGN KEY (`cv_id`) REFERENCES `cv` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,7 +41,8 @@ LOCK TABLES `comment` WRITE;
 /*!40000 ALTER TABLE `comment` DISABLE KEYS */;
 INSERT INTO `comment` VALUES
 (1,1,'faper','iane'),
-(2,2,'nhy','114514');
+(2,2,'nhy','114514'),
+(3,2,'amazing','mightyyyy');
 /*!40000 ALTER TABLE `comment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -56,10 +57,11 @@ CREATE TABLE `cv` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `author` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `content` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `state` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `department` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `state` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'unchecked',
+  `department_id` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -69,13 +71,16 @@ CREATE TABLE `cv` (
 LOCK TABLES `cv` WRITE;
 /*!40000 ALTER TABLE `cv` DISABLE KEYS */;
 INSERT INTO `cv` VALUES
-(1,'perinze','content','state','technical'),
-(2,'Excepteur','enim magna elit culpa','unchecked','cillum eu magna exercitation'),
-(3,'cupidatat occaecat Duis ullamco pariatur','labore','unchecked','veniam in occaecat'),
-(4,'cupidatat pariatur','labore','unchecked','veniam in occaecat'),
-(5,'cupidat pariatur','lare','unchecked','iam in occaecat'),
-(6,'cupidat pariatur','wdnmd','unchecked','iam in occaecat'),
-(8,'cupidat pariatur','nmsl','failed','iam in occaecat');
+(1,'perinze','content','state','od-9886e0c94d68ae5343afca2c450e83f7','2022-09-28 09:17:54'),
+(2,'Excepteur','enim magna elit culpa','unchecked','cillum eu magna exercitation','2022-09-20 04:34:56'),
+(3,'cupidatat occaecat Duis ullamco pariatur','labore','unchecked','veniam in occaecat','2022-09-20 04:34:56'),
+(4,'cupidatat pariatur','labore','unchecked','veniam in occaecat','2022-09-20 06:34:23'),
+(5,'cupidat pariatur','lare','unchecked','iam in occaecat','2022-09-20 20:34:11'),
+(6,'cupidat pariatur','wdnmd','unchecked','iam in occaecat','2022-09-25 12:34:32'),
+(8,'cupidat pariatur','nmsl','failed','iam in occaecat','2022-09-26 11:22:06'),
+(9,'cupidatxxxxxxxxx pariatur','nmslxxxxxx','unchecked','iam xxxxxxxxxxxxxin occaecat','2022-09-27 10:33:53'),
+(11,'cupidatxxxxxxxxx pariatur','nmslxxxxxx','fail','iam xxxxxxxxxxxxxin occaecat','2022-09-27 10:49:51'),
+(12,'cupidatxxxxxxxxx pariatur','nmslxxxxxx','unchecked','iam xxxxxxxxxxxxxin occaecatyyyyyyyyyyyyyyyy','2022-09-27 10:53:18');
 /*!40000 ALTER TABLE `cv` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -118,7 +123,7 @@ CREATE TABLE `mail` (
   `author` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `content` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -128,8 +133,7 @@ CREATE TABLE `mail` (
 LOCK TABLES `mail` WRITE;
 /*!40000 ALTER TABLE `mail` DISABLE KEYS */;
 INSERT INTO `mail` VALUES
-(1,'perinze','cv checked, welcome to interview'),
-(2,'azhr_zho','lzq love zcy & zcy love lzq');
+(1,'perinze','cv checked, welcome to interview');
 /*!40000 ALTER TABLE `mail` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -195,7 +199,7 @@ CREATE TABLE `user` (
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
 INSERT INTO `user` VALUES
-('ou_5d10bd6f694721395ee744414c48a543',1,1,1,1);
+('ou_5d10bd6f694721395ee744414c48a543',1,1,0,0);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -208,4 +212,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-09-18 20:48:35
+-- Dump completed on 2022-09-29  9:39:24
