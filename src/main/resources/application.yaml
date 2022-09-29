@@ -6,6 +6,18 @@ spring:
     url: ${URL:jdbc:mariadb://localhost/resume_dev?useSSL=false&characterEncoding=utf8}
     username: ${USERNAME:user}
     password: ${PASSWORD:password}
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    ssl: ${REDIS_SSL:false}
+    database: ${REDIS_DATABASE:0}
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1
+        max-idle: 8
+        min-idle: 0
 config:
   app-id: ${APPID:cli_a384ab309178d00c}
   app-secret: ${APPSECRET:wiZiveYzG1acpHXkzYwZWdvBumqmk3EL}

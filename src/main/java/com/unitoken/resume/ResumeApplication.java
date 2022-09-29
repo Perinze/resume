@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
@@ -75,5 +78,24 @@ public class ResumeApplication {
 	@Bean
 	DbTemplate createDbTemplate(@Autowired JdbcTemplate jdbcTemplate) {
 		return new DbTemplate(jdbcTemplate, LocalAbstractModel.class.getPackageName());
+	}
+
+	/*
+	@Bean
+	public RedisTemplate<String, Serializable> redisTemplate(LettuceConnectionFactory connectionFactory) {
+		RedisTemplate<String, Serializable> redisTemplate = new RedisTemplate<>();
+		redisTemplate.setKeySerializer(new StringRedisSerializer());
+		redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+		redisTemplate.setConnectionFactory(connectionFactory);
+		return redisTemplate;
+	}
+	 */
+	@Bean
+	public RedisTemplate<String, String> redisTemplate(LettuceConnectionFactory connectionFactory) {
+		RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+		redisTemplate.setKeySerializer(new StringRedisSerializer());
+		redisTemplate.setValueSerializer(new StringRedisSerializer());
+		redisTemplate.setConnectionFactory(connectionFactory);
+		return redisTemplate;
 	}
 }
