@@ -3,15 +3,17 @@ package com.unitoken.resume.web;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.unitoken.resume.context.UserContext;
 import com.unitoken.resume.database.DbTemplate;
 import com.unitoken.resume.database.Where;
+import com.unitoken.resume.exception.BadRequest;
+import com.unitoken.resume.exception.NotFound;
 import com.unitoken.resume.exception.PermissionDenied;
 import com.unitoken.resume.model.Comment;
 import com.unitoken.resume.model.Cv;
 import com.unitoken.resume.model.User;
 import com.unitoken.resume.service.CvService;
+import com.unitoken.resume.service.JsonService;
 import com.unitoken.resume.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +30,15 @@ public class CvController {
 
     @Autowired
     CvService cvService;
+
     @Autowired
     UserService userService;
+
+    @Autowired
+    JsonService jsonService;
+
+    @Autowired
+    UserContext userContext;
 
     @Autowired
     ObjectMapper mapper;
@@ -41,25 +50,27 @@ public class CvController {
 
     @GetMapping(value = "/cvs",
             produces = "application/json;charset=UTF-8")
-    public String getCv(@RequestHeader Map<String, String> headers, @RequestParam Map<String, String> params) throws Exception {
-        var from = db.from(Cv.class);
-        Where<Cv> where = from.where("true");
+    public String getCv(@RequestParam Map<String, String> params) throws Exception {
+        User user = userContext.getUser();
 
-        String token = headers.get("authorization");
-        if (token == null) {
-            throw new PermissionDenied();
-        }
-        User user = userService.getUser(userService.authorize(token));
+        var from = db.from(Cv.class);
+        Where<Cv> where = null;
+
+        // permission check
         if (user.getGlobalRead()) {
             logger.info("global read -> getting all cvs");
+
+            where = from.where("true");
         } else if (user.getDepartmentRead()) {
             logger.info("department read -> getting department cvs");
             logger.info("department id: " + user.getDepartmentId());
-            where = where.where("department_id = ?", user.getDepartmentId());
+
+            where = from.where("department_id = ?", user.getDepartmentId());
         } else {
             throw new PermissionDenied();
         }
 
+        // date check
         String after = params.get("after");
         if (after != null) {
             where = where.where("create_at > ?", Timestamp.valueOf(after));
@@ -70,21 +81,40 @@ public class CvController {
         }
 
         List<Cv> cvs = where.list();
-        ArrayNode root = mapper.valueToTree(cvs);
-        String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
-        logger.info(jsonString);
-        return jsonString;
+        for (Cv cv : cvs) {
+            cv.setComments(cvService.getComments(cv));
+        }
+        return jsonService.jsonString(cvs);
     }
 
     @GetMapping(value = "/cv/{id}",
             produces = "application/json;charset=UTF-8")
     public String getCv(@PathVariable Long id) throws JsonProcessingException {
-        logger.info("id=" + id);
-        Cv cv = cvService.getById(id);
-        ObjectNode root = mapper.valueToTree(cv);
-        String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
-        logger.info(jsonString);
-        return jsonString;
+        User user = userContext.getUser();
+
+        var from = db.from(Cv.class);
+        Where<Cv> where = from.where("id = ?", id);
+
+        // permission check
+        if (user.getGlobalRead()) {
+            logger.info("global read -> getting all cvs");
+
+            where = where.where("true");
+        } else if (user.getDepartmentRead()) {
+            logger.info("department read -> getting department cvs");
+            logger.info("department id: " + user.getDepartmentId());
+
+            where = where.where("department_id = ?", user.getDepartmentId());
+        } else {
+            throw new PermissionDenied();
+        }
+
+        Cv cv = where.first();
+        if (cv != null) {
+            cv.setComments(cvService.getComments(cv));
+        }
+
+        return jsonService.jsonString(cv);
     }
 
     @PostMapping(value = "/cv",
@@ -102,13 +132,56 @@ public class CvController {
     @PatchMapping(value = "/cv/{id}",
             consumes = "application/json;charset=UTF-8")
     public void patchCv(@PathVariable Long id, @RequestBody JsonNode cvNode) {
+        User user = userContext.getUser();
+
         // TODO check state as enum
-        String state = cvNode.get("state").asText();
-        cvService.modifyState(id, state);
+
+        // check if cv exists
+        Cv cv = db.from(Cv.class).where("id = ?", id).first();
+        if (cv == null) {
+            throw new NotFound();
+        }
+
+        // check permission
+        if (user.getGlobalWrite()) {
+
+        } else if (user.getDepartmentWrite()) {
+            if (!user.getDepartmentId().equals(cv.getDepartmentId())) {
+                throw new PermissionDenied();
+            }
+        } else {
+            throw new PermissionDenied();
+        }
+
+        JsonNode node = cvNode.get("state");
+        if (node == null) {
+            throw new BadRequest();
+        }
+        cv.setState(node.asText());
+        db.update(cv);
     }
 
     @DeleteMapping(value = "/cv/{id}")
     public void deleteCv(@PathVariable Long id) {
+        User user = userContext.getUser();
+
+        // check if cv exists
+        Cv cv = db.from(Cv.class).where("id = ?", id).first();
+        if (cv == null) {
+            throw new NotFound();
+        }
+
+        // check permission
+        if (user.getGlobalWrite()) {
+
+        } else if (user.getDepartmentWrite()) {
+            if (!user.getDepartmentId().equals(cv.getDepartmentId())) {
+                throw new PermissionDenied();
+            }
+        } else {
+            throw new PermissionDenied();
+        }
+
         cvService.deleteCv(id);
     }
 
